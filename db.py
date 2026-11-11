@@ -95,5 +95,36 @@ def get_listing(listing_id):
         con.close()
 
 
-# TODO(팀원 A): ② 목록 필터용 함수 — 예) get_listings_filtered(region, deal_type, max_price)
-#   값은 반드시 ? 자리에. CSV를 고친 뒤엔 jibgyeol.db 파일을 지우고 다시 켜야 새 데이터가 들어가요.
+def get_regions():
+    """매물이 있는 지역 목록 (② 목록 필터의 지역 선택칸)."""
+    con = get_db()
+    try:
+        return [r[0] for r in con.execute("SELECT DISTINCT region FROM listings ORDER BY region")]
+    finally:
+        con.close()
+
+
+def get_listings_filtered(region="", deal_type="", max_price=None, min_rooms=None):
+    """② 목록 필터. 빈 값은 '조건 없음'으로 보고 건너뛰어요.
+    사용자 값은 문장에 이어 붙이지 않고 전부 ? 자리에 넣어요 (SQL 인젝션 방지).
+    CSV를 고친 뒤엔 jibgyeol.db 파일을 지우고 다시 켜야 새 데이터가 들어가요."""
+    sql = "SELECT * FROM listings WHERE 1=1"
+    params = []
+    if region:
+        sql += " AND region = ?"
+        params.append(region)
+    if deal_type:
+        sql += " AND deal_type = ?"
+        params.append(deal_type)
+    if max_price is not None:                  # 보증금 · 매매가 기준 (만원)
+        sql += " AND price <= ?"
+        params.append(max_price)
+    if min_rooms is not None:
+        sql += " AND rooms >= ?"
+        params.append(min_rooms)
+    sql += " ORDER BY id"
+    con = get_db()
+    try:
+        return con.execute(sql, params).fetchall()
+    finally:
+        con.close()
