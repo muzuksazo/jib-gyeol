@@ -57,14 +57,30 @@
   {% endif %}
 
   <header class="detail-head">
-    <p class="detail-tags">
-      <span class="badge">{{ listing.deal_type }}</span>
-      {% if listing.splat_url %}<span class="chip chip-soft">360° 3D</span>{% endif %}
-    </p>
-    <h1>{{ listing.title }}</h1>
-    <p class="detail-region">{{ listing.region }}</p>
-    <p class="detail-price">{{ price_text }}</p>
+    <div class="detail-head-text">
+      <p class="detail-tags">
+        <span class="badge">{{ listing.deal_type }}</span>
+        {% if listing.splat_url %}<span class="chip chip-soft">360° 3D</span>{% endif %}
+      </p>
+      <h1>{{ listing.title }}</h1>
+      <p class="detail-region">{{ listing.region }}</p>
+      <p class="detail-price">{{ price_text }}</p>
+    </div>
+
+    {# 찜 · 의뢰 — 찜은 페이지를 새로 불러오지 않고 토스트로 알려요 (스크립트가 꺼져 있으면 보통 폼으로 동작) #}
+    <div class="detail-actions">
+      <form method="post" action="{{ url_for('wishlist.toggle', listing_id=listing.id) }}" data-wish-form>
+        {% set wished = listing.id in session.get('wish', []) %}
+        <button class="btn btn-sub" aria-pressed="{{ 'true' if wished else 'false' }}" data-wish-button>
+          <svg viewBox="0 0 24 24" fill="{{ 'currentColor' if wished else 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+          <span data-wish-label>{{ '찜 취소' if wished else '찜하기' }}</span>
+        </button>
+      </form>
+      <a class="btn" href="{{ url_for('request_form.form') }}">의뢰하기</a>
+    </div>
   </header>
+
+  <div class="detail-toast" data-toast role="status" aria-live="polite"></div>
 
   <div class="tabs" role="tablist" data-tabs>
     <button type="button" role="tab" id="tab-info" aria-controls="panel-info" aria-selected="true">정보</button>
@@ -110,17 +126,6 @@
     </figure>
   </section>
   {% endif %}
-
-  <div class="detail-actions">
-    <form method="post" action="{{ url_for('wishlist.toggle', listing_id=listing.id) }}">
-      {% set wished = listing.id in session.get('wish', []) %}
-      <button class="btn btn-sub">
-        <svg viewBox="0 0 24 24" fill="{{ 'currentColor' if wished else 'none' }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
-        {{ '찜 취소' if wished else '찜하기' }}
-      </button>
-    </form>
-    <a class="btn" href="{{ url_for('request_form.form') }}">이런 집 찾아 달라고 의뢰하기</a>
-  </div>
 </article>
 
 {# 탭: 누른 탭의 내용만 보여 준다. 스크립트가 꺼져 있으면 '정보'만 보인다. #}
@@ -143,5 +148,43 @@
     document.getElementById('tab-plan').remove();
     document.getElementById('panel-plan').remove();
   });
+
+  // 찜: 페이지를 새로 불러오지 않고(맨 위로 튀지 않게) 같은 주소로 보낸 뒤 토스트로 알린다.
+  // 찜 처리 자체는 PO의 /wishlist/toggle 그대로 — 서버가 돌려준 화면에서 결과(버튼 상태 · 찜 수 · 안내 문구)를 읽어 온다.
+  var wishForm = document.querySelector('[data-wish-form]');
+  var toast = document.querySelector('[data-toast]');
+  var toastTimer = null;
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('is-on'); }, 2600);
+  }
+  if (wishForm && window.fetch && window.DOMParser) {
+    wishForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var button = wishForm.querySelector('[data-wish-button]');
+      button.disabled = true;
+      fetch(wishForm.action, { method: 'POST', credentials: 'same-origin' })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.status);
+          return res.text();
+        })
+        .then(function (html) {
+          var page = new DOMParser().parseFromString(html, 'text/html');
+          var fresh = page.querySelector('[data-wish-button]');
+          if (fresh) button.innerHTML = fresh.innerHTML, button.setAttribute('aria-pressed', fresh.getAttribute('aria-pressed'));
+          var freshNav = page.querySelector('.nav a[href$="/wishlist"]');
+          var nav = document.querySelector('.nav a[href$="/wishlist"]');
+          if (freshNav && nav) nav.textContent = freshNav.textContent;   // 상단 '찜 (N)' 숫자
+          var flash = page.querySelector('.flash');
+          showToast(flash ? flash.textContent : '찜 목록을 바꿨어요.');
+        })
+        .catch(function () {
+          wishForm.submit();   // 문제가 생기면 원래 방식(페이지 새로 불러오기)으로
+        })
+        .finally(function () { button.disabled = false; });
+    });
+  }
 </script>
 {% endblock %}
