@@ -176,7 +176,10 @@
           if (fresh) button.innerHTML = fresh.innerHTML, button.setAttribute('aria-pressed', fresh.getAttribute('aria-pressed'));
           var freshNav = page.querySelector('.nav a[href$="/wishlist"]');
           var nav = document.querySelector('.nav a[href$="/wishlist"]');
-          if (freshNav && nav) nav.textContent = freshNav.textContent;   // 상단 '찜 (N)' 숫자
+          if (freshNav && nav) {   // 상단 찜 배지 — 글자만 바꾸면 배지(<span class="nav-badge">)가 지워지니 통째로 바꿈
+            nav.innerHTML = freshNav.innerHTML;
+            nav.setAttribute('aria-label', freshNav.getAttribute('aria-label') || '찜');
+          }
           var flash = page.querySelector('.flash');
           showToast(flash ? flash.textContent : '찜 목록을 바꿨어요.');
         })
