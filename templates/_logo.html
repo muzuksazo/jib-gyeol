@@ -1,0 +1,11 @@
+{# 공통 로고 (담당: 원님) — 브랜드 가이드 로고: 아이콘 + 집결 + ZIPGYEOL
+   쓰는 법: {% from "_logo.html" import logo %}  →  {{ logo() }}  /  흰색: {{ logo(white=True) }} #}
+{% macro logo(white=False) -%}
+<a class="logo{% if white %} logo-white{% endif %}" href="{{ url_for('home.index') }}" aria-label="집결 ZIPGYEOL 홈으로">
+  <svg class="logo-mark" viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
+  <span class="logo-word" aria-hidden="true">
+    <span class="logo-ko">집결</span>
+    <span class="logo-en">{% for ch in "ZIPGYEOL" %}<span>{{ ch }}</span>{% endfor %}</span>
+  </span>
+</a>
+{%- endmacro %}
