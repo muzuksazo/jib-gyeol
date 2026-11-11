@@ -4,14 +4,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}jib-gyeol{% endblock %}</title>
+  <title>{% block title %}집결 ZIPGYEOL{% endblock %}</title>
+  <meta name="description" content="집 정보가 한곳에 모이다, 집의 결을 볼 수 있다. 지금, 집결과 함께 온라인으로 임장해보세요.">
+  <meta name="theme-color" content="#0056FF">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='brand/app-icon.svg') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='brand/app-icon.svg') }}">
+  {# 브랜드 글꼴: Pretendard #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% block head %}{% endblock %}
 </head>
 <body>
+  {# 브랜드 가이드 로고 심볼 (static/brand/logo-mark.svg 와 같은 모양)
+     다른 페이지에서도 <svg class="logo-mark" viewBox="0 0 164 138"><use href="#logo-house"/></svg> 로 쓸 수 있어요 #}
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="logo-house" viewBox="0 0 164 138">
+      <path fill="currentColor" d="M0 62 82 0l82 62v75l-24-16V74L82 30 24 74v47L0 137z"/>
+      <rect fill="currentColor" x="68" y="78" width="28" height="28"/>
+    </symbol>
+  </svg>
+
+  {% from "_logo.html" import logo with context %}
   <header class="nav">
-    <a class="logo" href="{{ url_for('home.index') }}">jib-gyeol</a>  {# TODO(원님): 서비스 이름 · 로고 #}
-    <nav>
+    {{ logo() }}
+    <nav aria-label="주 메뉴">
       <a href="{{ url_for('listings.index') }}">매물 보기</a>
       <a href="{{ url_for('request_form.form') }}">의뢰서 남기기</a>
       <a href="{{ url_for('wishlist.index') }}">찜 ({{ session.get('wish', [])|length }})</a>
@@ -23,6 +39,9 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="foot">가상 서비스 · D21 팀 프로젝트</footer>
+  <footer class="foot">
+    <strong>집결 ZIPGYEOL</strong> · 집 정보가 한곳에 모이다, 집의 결을 볼 수 있다.<br>
+    가상 서비스 · D21 팀 프로젝트
+  </footer>
 </body>
 </html>

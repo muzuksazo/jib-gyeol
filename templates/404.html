@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 {# 404 — 디자인: 원님. 없는 주소 · 없는 매물 번호일 때 #}
-{% block title %}찾을 수 없어요{% endblock %}
+{% block title %}찾을 수 없어요 · 집결{% endblock %}
 {% block content %}
-<h1>찾는 집이 없어요</h1>
-<p>주소가 바뀌었거나 이미 내려간 매물일 수 있어요.</p>
-<p><a href="{{ url_for('listings.index') }}">다른 매물 보러 가기</a></p>
+<section class="status-page">
+  <img class="status-icon" src="{{ url_for('static', filename='brand/app-icon-white.svg') }}" alt="">
+  <p class="status-code">404</p>
+  <h1>찾는 집이 없어요</h1>
+  <p>주소가 바뀌었거나 이미 내려간 매물일 수 있어요.</p>
+  <div class="status-actions">
+    <a class="btn" href="{{ url_for('listings.index') }}">다른 매물 보러 가기</a>
+    <a class="btn btn-sub" href="{{ url_for('home.index') }}">홈으로</a>
+  </div>
+</section>
 {% endblock %}
