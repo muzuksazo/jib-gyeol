@@ -15,7 +15,8 @@
 .detail-back svg { width: 20px; height: 20px; }
 .detail-back:hover { background: var(--color-sub); color: var(--color-primary); }
 
-.detail-head { margin: 24px 0 20px; }
+.detail-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin: 24px 0 20px; }
+.detail-head-text { min-width: 0; flex: 1 1 320px; }
 .detail-tags { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
 .detail-head h1 { font-size: clamp(24px, 3.4vw, 32px); margin: 0 0 4px; }
 .detail-region { margin: 0 0 8px; color: var(--color-text-desc); font-size: 15px; }
@@ -25,8 +26,26 @@
 .detail-h2 { font-size: 22px; margin: 32px 0 8px; }
 .detail-desc { margin: 0; color: var(--color-text-sub); }
 
-.detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 36px 0 0; }
+.detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .detail-actions form { margin: 0; }
+.detail-actions .btn { padding: 0 20px; }
+.detail-actions .btn svg { width: 18px; height: 18px; }
+.detail-actions .btn:disabled { opacity: .6; cursor: progress; }
+
+/* 찜 토스트 — 화면 아래 가운데에 잠깐 떴다 사라짐 (페이지가 움직이지 않게) */
+.detail-toast {
+    position: fixed; left: 50%; bottom: 24px; z-index: 1100;
+    transform: translate(-50%, 16px);
+    max-width: calc(100% - 32px); padding: 12px 20px;
+    border-radius: var(--radius-pill);
+    background: var(--color-text); color: var(--color-white);
+    font-size: 15px; font-weight: 600; text-align: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+}
+.detail-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.detail-toast:empty { padding: 0; }
 
 /* 평면도 탭 */
 .detail-plan { margin: 0; text-align: center; }
@@ -180,7 +199,8 @@ html.viewer-expanded { overflow: hidden; }
     .viewer-hint { left: 10px; right: 10px; top: 64px; max-width: none; font-size: 13px; text-align: center; }
     .viewer-minimap { left: 10px; bottom: 10px; border-width: 6px; }
     .viewer-credit { right: 10px; max-width: calc(100% - 180px); font-size: 11px; }
-    .detail-actions .btn, .detail-actions form { flex: 1 1 100%; }
+    .detail-actions { width: 100%; }
+    .detail-actions form, .detail-actions > .btn { flex: 1; }
     .detail-actions form .btn { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
