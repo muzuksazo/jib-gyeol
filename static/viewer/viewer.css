@@ -124,10 +124,11 @@ html.viewer-expanded { overflow: hidden; }
 .viewer.is-ready .viewer-minimap, .viewer.is-ready .viewer-credit { opacity: 1; }
 
 .viewer-hint {
-    position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
-    margin: 0; padding: 7px 14px; border-radius: 999px;
+    position: absolute; left: 12px; top: 12px;
+    max-width: calc(100% - 300px);          /* 오른쪽 버튼 줄과 겹치지 않게 */
+    margin: 0; padding: 7px 14px; border-radius: 18px;
     background: rgba(255, 255, 255, .92); color: var(--ink);
-    font-size: 13px; white-space: nowrap; pointer-events: none;
+    font-size: 13px; line-height: 1.4; pointer-events: none;
     box-shadow: 0 2px 10px rgba(0, 40, 120, .12);
 }
 .viewer-hint b { color: var(--brand); }
@@ -146,14 +147,14 @@ html.viewer-expanded { overflow: hidden; }
 /* 미니맵 */
 .viewer-minimap {
     position: absolute; left: 12px; bottom: 12px;
-    width: clamp(120px, 24%, 220px);
-    border-radius: 12px; overflow: hidden;
-    background: #fff; border: 2px solid #fff;
+    width: clamp(130px, 26%, 240px);
+    border-radius: 12px;
+    background: var(--brand-neutral); border: 6px solid var(--brand-neutral);
     box-shadow: 0 4px 18px rgba(0, 40, 120, .22);
     cursor: pointer;
 }
 .viewer-minimap[hidden] { display: none; }
-.viewer-minimap img { display: block; width: 100%; height: 100%; object-fit: fill; background: var(--brand-neutral); }
+.viewer-minimap img { display: block; width: 100%; height: 100%; object-fit: fill; }
 .mm-me, .mm-ghost { position: absolute; width: 0; height: 0; pointer-events: none; }
 .mm-me::before {            /* 바라보는 방향(부채꼴) */
     content: ""; position: absolute; left: -22px; top: -22px; width: 44px; height: 44px; border-radius: 50%;
@@ -179,7 +180,7 @@ html.viewer-expanded { overflow: hidden; }
 
 @media (max-width: 560px) {
     .viewer { aspect-ratio: 4 / 5; }
-    .viewer-hint { top: 56px; font-size: 12px; }
+    .viewer-hint { top: 56px; right: 12px; max-width: none; font-size: 12px; text-align: center; }
     .viewer-tools button { padding: 0 9px; font-size: 12px; }
     .viewer-credit { max-width: calc(100% - 150px); font-size: 10px; }
 }

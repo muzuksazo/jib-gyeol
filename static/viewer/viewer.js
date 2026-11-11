@@ -72,10 +72,12 @@ async function start(root) {
     app.setCanvasFillMode(FILLMODE_NONE);
     app.setCanvasResolution(RESOLUTION_AUTO);
 
-    // 고해상도 화면(DPR 2 이상)은 절반 해상도로 그려 프레임을 지킨다
+    // 해상도: 기기 해상도 그대로(최대 2배, 휴대폰은 1.5배) 그린다.
+    // 실제로 느릴 때만 renderScale을 낮춘다(아래 '매 프레임' 참고).
+    let renderScale = 1;
     const resize = () => {
         const dpr = window.devicePixelRatio || 1;
-        device.maxPixelRatio = dpr >= 2 ? dpr * 0.5 : dpr;
+        device.maxPixelRatio = Math.min(dpr, platform.mobile ? 1.5 : 2) * renderScale;
         app.resizeCanvas();
     };
     new ResizeObserver(resize).observe(root);
@@ -276,18 +278,20 @@ async function start(root) {
     if (nav && minimap) {
         const img = minimap.querySelector('img');
         img.src = `${baseUrl}map.png`;
-        minimap.style.aspectRatio = `${nav.width} / ${nav.depth}`;
+        // map.png가 덮는 범위 (없으면 바닥 지도 전체)
+        const area = nav.map || { minX: nav.minX, minZ: nav.minZ, sizeX: nav.width * nav.cell, sizeZ: nav.depth * nav.cell };
+        minimap.style.aspectRatio = `${area.sizeX} / ${area.sizeZ}`;
         minimap.hidden = false;
         mm = { me: el('me'), ghost: el('ghost') };
         const toWorld = (e) => {
             const r = minimap.getBoundingClientRect();
-            const x = nav.minX + ((e.clientX - r.left) / r.width) * nav.width * nav.cell;
-            const z = nav.minZ + ((e.clientY - r.top) / r.height) * nav.depth * nav.cell;
+            const x = area.minX + ((e.clientX - r.left) / r.width) * area.sizeX;
+            const z = area.minZ + ((e.clientY - r.top) / r.height) * area.sizeZ;
             return nav.nearestWalkable(x, z, 3);
         };
         const place = (node, x, z) => {
-            node.style.left = `${((x - nav.minX) / (nav.width * nav.cell)) * 100}%`;
-            node.style.top = `${((z - nav.minZ) / (nav.depth * nav.cell)) * 100}%`;
+            node.style.left = `${((x - area.minX) / area.sizeX) * 100}%`;
+            node.style.top = `${((z - area.minZ) / area.sizeZ) * 100}%`;
         };
         mm.place = place;
         minimap.addEventListener('pointermove', (e) => {
@@ -337,7 +341,29 @@ async function start(root) {
 
     // ── 매 프레임 ────────────────────────────────────────────
     const fwd = new Vec3();
+    const pace = { frames: 0, time: 0, slow: 0, last: performance.now() };
     app.on('update', (dt) => {
+        // 느린 기기 보호: 2초 평균이 27fps 아래로 두 번 연속 떨어지면 해상도를 한 단계 낮춘다 (최저 절반).
+        // 프레임 간격이 0.25초를 넘으면 기기가 느린 게 아니라 브라우저가 탭을 쉬게 하는 것이므로 세지 않는다.
+        const now = performance.now();
+        const gap = (now - pace.last) / 1000;
+        pace.last = now;
+        if (gap > 0.25 || document.hidden) {
+            pace.frames = pace.time = pace.slow = 0;
+        } else if (shown && renderScale > 0.5) {
+            pace.frames++;
+            pace.time += gap;
+            if (pace.time >= 2) {
+                pace.slow = pace.frames / pace.time < 27 ? pace.slow + 1 : 0;
+                pace.frames = pace.time = 0;
+                if (pace.slow >= 2) {
+                    pace.slow = 0;
+                    renderScale = Math.max(0.5, renderScale - 0.25);
+                    resize();
+                }
+            }
+        }
+
         // 시선: 목표 각도를 부드럽게 따라간다 (튀지 않게)
         const follow = 1 - Math.exp(-dt * 16);
         view.yaw += (view.yawTo - view.yaw) * follow;
@@ -383,7 +409,7 @@ async function start(root) {
         }
     });
 
-    window.__jibViewer = { app, camera, view, nav, goTo };   // 확인·디버깅용
+    window.__jibViewer = { app, camera, view, nav, goTo, get renderScale() { return renderScale; } };   // 확인·디버깅용
 }
 
 // nav.json + nav.png → 걸을 수 있는 바닥을 묻는 함수들. 파일이 없으면 null.

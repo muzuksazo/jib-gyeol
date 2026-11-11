@@ -4,7 +4,7 @@
 
 장면 폴더에 세 파일을 쓴다.
   nav.png  — 흰색 = 걸을 수 있는 바닥 (한 칸 5cm)
-  map.png  — 위에서 내려다본 컬러 평면도 (천장은 잘라 냄, 미니맵용)
+  map.png  — 도면처럼 단순하게 그린 평면도 (미니맵용: 흰 바닥 · 진한 벽 · 연한 가구)
   nav.json — 범위 · 바닥 높이 · 눈높이 · 시작 위치와 방향
 좌표는 뷰어 기준(스플랫을 X축으로 180도 돌린 뒤: X=x, Y=-y, Z=-z, 위가 +Y).
 필요: numpy, pillow
@@ -14,14 +14,12 @@ import sys
 from collections import deque
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 
 CELL = 0.05          # 격자 한 칸 (m)
 BODY = 0.18          # 사람 반경 — 벽·가구에서 이만큼 떨어진 곳만 걸을 수 있음 (m)
 OBST_LOW, OBST_HIGH = 0.25, 1.7   # 바닥에서 이 높이 사이에 뭔가 있으면 장애물 (m)
 EYE = 1.5            # 눈높이 (m)
-MAP_CELL = 0.025     # 평면도 그림 한 칸 (m)
-MAP_CUT = 2.0        # 바닥에서 이 높이 위(천장·조명)는 평면도에서 뺀다 (m)
 
 
 def read_ply(path):
@@ -38,8 +36,7 @@ def read_ply(path):
     kinds = {'float': '<f4', 'double': '<f8', 'uchar': 'u1', 'int': '<i4'}
     d = np.fromfile(f, dtype=np.dtype([(name, kinds[t]) for t, name in props]), count=n)
     opacity = 1 / (1 + np.exp(-d['opacity']))
-    rgb = np.clip(0.5 + 0.28209479 * np.stack([d['f_dc_0'], d['f_dc_1'], d['f_dc_2']], 1), 0, 1)
-    return d['x'], -d['y'], -d['z'], opacity, rgb
+    return d['x'], -d['y'], -d['z'], opacity
 
 
 def dilate(mask, radius_cells):
@@ -75,7 +72,7 @@ def components(mask):
 
 
 def main(ply, out_dir):
-    X, Y, Z, op, rgb = read_ply(ply)
+    X, Y, Z, op = read_ply(ply)
     solid = op > 0.5
 
     # 바닥 높이: 5cm 두께로 썰었을 때 '덮인 면적'이 넓은 가장 낮은 층.
@@ -142,31 +139,48 @@ def main(ply, out_dir):
         if steps > best_len:
             best_yaw, best_len = yaw, steps
 
-    # 평면도: 천장을 잘라 내고 위에서 본 색. 높은 점이 낮은 점을 덮는다.
-    scale = int(round(CELL / MAP_CELL))
-    mw, md = w * scale, d * scale
-    sel = (op > 0.3) & (Y > floor - 0.3) & (Y < floor + MAP_CUT)
-    xi = ((X[sel] - x0) / MAP_CELL).astype(int)
-    zi = ((Z[sel] - z0) / MAP_CELL).astype(int)
-    inside = (xi >= 0) & (xi < mw) & (zi >= 0) & (zi < md)
-    order = np.argsort(Y[sel][inside])
-    xi, zi, col = xi[inside][order], zi[inside][order], rgb[sel][inside][order]
-    img = np.zeros((md, mw, 3), 'f4')
-    filled = np.zeros((md, mw), bool)
-    img[zi, xi] = col
-    filled[zi, xi] = True
-    for _ in range(6):   # 점 사이의 작은 빈칸은 이웃 색 평균으로 메운다
-        acc, cnt = np.zeros_like(img), np.zeros((md, mw), 'f4')
-        for dz in (-1, 0, 1):
-            for dx in (-1, 0, 1):
-                src_f = np.roll(np.roll(filled, dz, 0), dx, 1)
-                acc += np.roll(np.roll(img, dz, 0), dx, 1) * src_f[..., None]
-                cnt += src_f
-        grow = ~filled & (cnt >= 3)
-        img[grow] = acc[grow] / cnt[grow][:, None]
-        filled |= grow
-    rgba = np.dstack([np.clip(img * 255, 0, 255), filled * 255]).astype('u1')
-    Image.fromarray(rgba, 'RGBA').save(f'{out_dir}/map.png', optimize=True)
+    # 평면도(미니맵): 스캔 색을 그대로 찍으면 얼룩덜룩해서, 도면처럼 단순하게 그린다.
+    #   집 안 바닥 = 흰색 · 벽과 키 큰 가구 = 진한 남색 · 낮은 가구 = 연한 파랑 · 집 밖 = 투명
+    def close(mask, r):                                     # 틈 메우기
+        return ~dilate(~dilate(mask, r), r)
+
+    def open_(mask, r):                                     # 얇은 부스러기 지우기
+        return dilate(~dilate(~mask, r), r)
+
+    def keep_big(mask, min_m2):
+        lab, cnt = components(mask)
+        return np.isin(lab, [k for k, n in enumerate(cnt) if k and n * CELL * CELL >= min_m2])
+
+    reach = dilate(walk, int(round(BODY / CELL)) + 1)       # 걸을 수 있는 바닥을 벽까지 넓힌 것
+    lab, cnt = components(obstacle | reach)                 # 바닥과 이어진 벽·가구만 (집 밖 조각 제외)
+    linked = np.isin(lab, np.unique(lab[reach])) & obstacle
+    tall = linked & grid(solid & (Y > floor + 1.45) & (Y < floor + 1.75), 2)   # 눈높이까지 닿는 것 = 벽
+    tall = keep_big(close(tall, 2), 0.08)
+    low = keep_big(open_(close(linked & ~dilate(tall, 1), 2), 2), 0.15) & ~tall   # 낮은 가구
+    inside = close(reach | low | tall, 3)
+    lab, cnt = components(~inside)                          # 안쪽에 갇힌 구멍도 집 안으로
+    border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+    inside = ~np.isin(lab, list(border))
+
+    zs, xs = np.nonzero(inside)
+    m = 6                                                    # 여백(칸)
+    cz0, cz1 = max(0, zs.min() - m), min(d, zs.max() + m + 1)
+    cx0, cx1 = max(0, xs.min() - m), min(w, xs.max() + m + 1)
+    UP = 8                                                   # 한 칸을 8픽셀로 키워 가장자리를 매끈하게
+
+    def smooth(mask):
+        im = Image.fromarray((mask[cz0:cz1, cx0:cx1] * 255).astype('u1'))
+        im = im.resize((im.width * UP, im.height * UP), Image.BICUBIC).filter(ImageFilter.GaussianBlur(UP * 0.45))
+        return np.clip((np.asarray(im, 'f4') - 96) / 64, 0, 1)    # 0~1 덮임 정도 (가장자리만 부드럽게)
+
+    a_in, a_low, a_tall = smooth(inside), smooth(low), smooth(tall)
+    rgb = np.ones(a_in.shape + (3,), 'f4') * np.array([255, 255, 255], 'f4')
+    for alpha, color in ((a_low, (205, 221, 250)), (a_tall, (38, 52, 84))):
+        rgb = rgb * (1 - alpha[..., None]) + np.array(color, 'f4') * alpha[..., None]
+    alpha = a_in * 255
+    Image.fromarray(np.dstack([rgb, alpha]).astype('u1'), 'RGBA').save(f'{out_dir}/map.png', optimize=True)
+    map_area = {'minX': round(float(x0 + cx0 * CELL), 3), 'minZ': round(float(z0 + cz0 * CELL), 3),
+                'sizeX': round(float((cx1 - cx0) * CELL), 3), 'sizeZ': round(float((cz1 - cz0) * CELL), 3)}
 
     Image.fromarray((walk * 255).astype('u1')).save(f'{out_dir}/nav.png', optimize=True)
     meta = {
@@ -175,6 +189,7 @@ def main(ply, out_dir):
         'minX': round(float(x0), 3), 'minZ': round(float(z0), 3),
         'floorY': round(floor, 3), 'ceilingY': round(ceil, 3), 'eyeHeight': EYE,
         'start': [round(float(v), 3) for v in start], 'startYaw': best_yaw,
+        'map': map_area,                  # map.png가 덮는 범위 (m)
     }
     json.dump(meta, open(f'{out_dir}/nav.json', 'w'), indent=2)
     areas = sorted((round(s * CELL * CELL, 1) for s in sizes[1:]), reverse=True)
