@@ -1,23 +1,87 @@
 # ④ 의뢰서 남기기 — 담당: 팀원 B
 # 주소: /request   ·   GET = 폼 보기, POST = 저장 (값을 바꾸는 일이니 POST = 봉투)
-# 할 일 (오전 수업 그대로):
-#   1. 서버 검증 — 닉네임 1~20자 · 예산 숫자 · 방 수 1~5 · 요청 1~200자
+#   1. 서버 검증 (validate.py) — 닉네임 1~20자 · 지역 1~20자 · 예산 숫자 · 방 수 1~5 · 요청 1~200자
 #      틀리면 저장 X, 400 상태 코드, 칸별 문구, 입력값은 남겨 두기
 #   2. 저장 — db.get_db()로 requests 표에 INSERT, 값은 반드시 ? 자리에
 #   3. PRG — 저장 성공 뒤 redirect + flash("의뢰서가 접수됐어요")
-#   4. 공격 표 10개로 직접 확인 (<script>, DROP TABLE, F12로 값 바꾸기 ...)
+
+from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-import db  # noqa: F401  (저장할 때 사용)
+import db
+from validate import validate_request
 
 bp = Blueprint("request_form", __name__)
+
+KST = timezone(timedelta(hours=9))   # Render 서버는 시간이 달라서 한국 시간으로 직접 적어요
+
+
+def save_request(values):
+    con = db.get_db()
+    try:
+        with con:   # 잘 끝나면 알아서 commit
+            con.execute(
+                "INSERT INTO requests (nickname, region, budget, rooms, message, created_at)"
+                " VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    values["nickname"],
+                    values["region"],
+                    int(values["budget"]),
+                    int(values["rooms"]),
+                    values["message"],
+                    datetime.now(KST).strftime("%Y-%m-%d %H:%M"),
+                ),
+            )
+    finally:
+        con.close()
+
+
+def won_text(value):
+    """만원 단위 숫자를 읽는 말로: 20000 → '2억원', 25000 → '2억 5,000만원'. 숫자가 아니면 빈 글자."""
+    text = str(value if value is not None else "").strip()
+    if not (text.isascii() and text.isdigit()) or len(text) > 7 or int(text) < 1:
+        return ""
+    eok, rest = divmod(int(text), 10000)
+    parts = []
+    if eok:
+        parts.append(f"{eok}억")
+    if rest:
+        parts.append(f"{rest:,}만")
+    return " ".join(parts) + "원"
+
+
+def recent_requests(limit=6):
+    con = db.get_db()
+    try:
+        rows = con.execute(
+            "SELECT * FROM requests ORDER BY id DESC LIMIT ?", (limit,)
+        ).fetchall()
+    finally:
+        con.close()
+    return [{**dict(row), "budget_text": won_text(row["budget"])} for row in rows]
+
+
+def show_form(values, errors):
+    return render_template(
+        "request.html",
+        values=values,
+        errors=errors,
+        budget_text=won_text(values.get("budget")),
+        recent=recent_requests(),
+    )
 
 
 @bp.route("/request", methods=["GET", "POST"])
 def form():
     if request.method == "POST":
-        # TODO(팀원 B): 검증 → 저장 → redirect. 지금은 저장하지 않고 안내만 해요.
-        flash("아직 저장 기능을 만드는 중이에요.")
-        return redirect(url_for("request_form.form"))
-    return render_template("request.html", values={}, errors={})
+        values, errors = validate_request(request.form)
+        if errors:
+            # 실패하면 redirect 하지 않아요. 쓴 값을 그대로 둔 채 400 으로 같은 화면을 다시 보여 줘요.
+            return show_form(values, errors), 400
+
+        save_request(values)
+        flash("의뢰서가 접수됐어요")
+        return redirect(url_for("request_form.form"))   # PRG — 새로고침해도 두 번 저장되지 않아요
+
+    return show_form({}, {})
