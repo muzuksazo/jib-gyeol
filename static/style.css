@@ -1,11 +1,295 @@
-/* style.css — 담당: 원님. 최소 스타일만 넣어 뒀어요. */
-body { margin: 0; font-family: Pretendard, "Malgun Gothic", system-ui, sans-serif; line-height: 1.6; color: #1f2937; }
-.nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #e5e7eb; }
-.nav nav a { margin-left: 14px; }
-.logo { font-weight: 800; text-decoration: none; }
-main { max-width: 860px; margin: 0 auto; padding: 20px; }
-.flash { background: #ecfdf3; padding: 8px 12px; border-radius: 8px; }
-.error { color: #b42318; margin: 2px 0 10px; }
-label { display: block; margin: 10px 0; }
-.todo { color: #9ca3af; font-size: 14px; }
-.foot { text-align: center; color: #9ca3af; padding: 24px; font-size: 14px; }
+/* style.css — 담당: 원님 (디자인)
+   집결 ZIPGYEOL 브랜드 가이드(brandguide.png)를 그대로 옮긴 공통 스타일이에요.
+   색 · 글자색 · 면 색은 가이드 이미지에서 직접 뽑은 값이에요.
+   팀원들은 아래 변수(--color-*)와 공통 클래스(.btn, .card, .chip, .tabs, .stat ...)를 가져다 쓰면 돼요.
+   색을 직접 #코드로 쓰지 말고 var(--color-primary)처럼 변수로 써 주세요. */
+
+/* ---------- 1. 브랜드 토큰 (가이드 COLOR PALETTE · TYPOGRAPHY) ---------- */
+:root {
+  /* 공식 팔레트 */
+  --color-primary: #0056FF;        /* Primary · 신뢰와 편리함을 주는 집결의 메인 컬러 */
+  --color-sub: #E6F0FF;            /* Sub */
+  --color-neutral: #F8FAFF;        /* Neutral */
+
+  /* 가이드 화면에서 뽑은 보조 색 */
+  --color-primary-dark: #0046D1;   /* 버튼 눌림 */
+  --color-chip: #DAE6FE;           /* BRAND KEYWORDS 칩 배경 */
+  --color-surface: #F5F8FD;        /* 기능 카드 · 브랜드 패널 면 */
+  --color-text: #181B25;           /* 로고 '집결' · 제목 */
+  --color-text-sub: #3B4150;       /* 로고 아래 슬로건 */
+  --color-text-desc: #646374;      /* 카드 설명 */
+  --color-text-label: #676B83;     /* ZIPGYEOL · 섹션 라벨 */
+  --color-border: #E8ECF5;
+  --color-white: #FFFFFF;
+  --color-star: #F4C94D;           /* 평점 별 */
+  --sky-top: #4589FC;              /* 히어로 하늘 */
+  --sky-bottom: #B3CEFD;
+
+  /* 상태 */
+  --color-success-bg: #E8F7EE;
+  --color-success: #13804B;
+  --color-error: #D92D20;
+
+  /* 글꼴: Pretendard */
+  --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+          "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+
+  --radius-sm: 12px;
+  --radius: 20px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow: 0 6px 24px rgba(24, 27, 37, 0.07);
+  --shadow-lg: 0 14px 40px rgba(24, 27, 37, 0.12);
+  --max-width: 1120px;
+}
+
+/* ---------- 2. 기본 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh; display: flex; flex-direction: column;   /* 푸터를 항상 바닥에 */
+  font-family: var(--font);
+  font-size: 16px; line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;            /* 한글 단어 중간에서 줄바꿈 안 되게 */
+}
+body > main { flex: 1; width: 100%; max-width: var(--max-width); margin: 0 auto; padding: 28px 20px 72px; }
+
+h1, h2, h3 { line-height: 1.3; letter-spacing: -0.02em; margin: 0 0 12px; color: var(--color-text); }
+h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; }
+h2 { font-size: clamp(22px, 3vw, 28px); font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p  { margin: 0 0 12px; }
+a { color: var(--color-primary); }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; border-radius: 6px; }
+
+/* 섹션 라벨 (가이드의 LOGO · COLOR PALETTE · BRAND KEYWORDS 같은 작은 제목) */
+.label { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-label); margin: 0 0 14px; }
+
+/* ---------- 3. 로고 ---------- */
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--color-text); }
+.logo-mark { height: 34px; width: auto; aspect-ratio: 164 / 138; color: var(--color-primary); flex-shrink: 0; }
+.logo-word { display: inline-flex; flex-direction: column; line-height: 1; }
+.logo-ko { font-size: 25px; font-weight: 900; letter-spacing: -0.04em; }
+/* ZIPGYEOL: 글자 사이를 벌려 '집결' 폭에 딱 맞춤 (가이드 로고처럼) */
+.logo-en { display: flex; justify-content: space-between; width: 0; min-width: 100%; margin-top: 4px; padding-left: .1em;
+           font-size: 7.5px; font-weight: 500; line-height: 1; color: var(--color-text-label); }
+.logo-white, .logo-white .logo-mark, .logo-white .logo-en { color: var(--color-white); }
+
+/* ---------- 4. 상단 메뉴 ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 14px max(20px, calc((100% - var(--max-width)) / 2 + 20px));
+  background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-border);
+}
+.nav nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav nav a {
+  padding: 10px 14px; border-radius: var(--radius-pill);
+  color: var(--color-text-sub); text-decoration: none; font-weight: 600; font-size: 15px;
+  transition: background .15s, color .15s;
+}
+.nav nav a:hover { background: var(--color-sub); color: var(--color-primary); }
+
+/* ---------- 5. 버튼 ---------- */
+.btn, button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 24px;
+  font: inherit; font-weight: 600; font-size: 16px;
+  border: 0; border-radius: var(--radius-pill); cursor: pointer; text-decoration: none;
+  background: var(--color-primary); color: var(--color-white);
+  transition: background .15s, transform .1s, box-shadow .15s;
+}
+.btn:hover, button:hover { background: var(--color-primary-dark); color: var(--color-white); }
+.btn:active, button:active { transform: scale(0.98); }
+.btn svg { width: 20px; height: 20px; }
+/* 가이드 히어로의 "지금 시작하기 →" — 흰 알약 버튼 */
+.btn-white { background: var(--color-white); color: var(--color-text); box-shadow: var(--shadow); }
+.btn-white:hover { background: var(--color-neutral); color: var(--color-text); }
+.btn-sub { background: var(--color-sub); color: var(--color-primary); }
+.btn-sub:hover { background: var(--color-chip); color: var(--color-primary); }
+/* 앱 화면의 둥근 흰 아이콘 버튼 (필터 · 뒤로가기) */
+.icon-btn {
+  display: inline-grid; place-items: center; width: 52px; height: 52px; flex-shrink: 0;
+  background: var(--color-white); color: var(--color-text); border-radius: 16px; box-shadow: var(--shadow);
+}
+.icon-btn:hover { background: var(--color-neutral); color: var(--color-text); }
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn.round { border-radius: 50%; }
+
+/* ---------- 6. 입력칸 · 검색창 ---------- */
+label { display: block; margin: 14px 0 6px; font-weight: 600; font-size: 15px; }
+input, select, textarea {
+  width: 100%; min-height: 48px; padding: 12px 16px;
+  font: inherit; color: var(--color-text);
+  background: var(--color-white);
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  transition: border-color .15s, box-shadow .15s;
+}
+textarea { min-height: 120px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--color-text-desc); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 4px var(--color-sub); }
+.error { color: var(--color-error); font-size: 14px; margin: 4px 0 10px; }
+
+/* 앱 화면의 검색창: 흰 알약 + 돋보기 + 옆에 필터 버튼 */
+.search-bar { display: flex; gap: 10px; align-items: center; }
+.search-field { position: relative; flex: 1; }
+.search-field svg { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--color-text); pointer-events: none; }
+.search-field input {
+  min-height: 52px; padding-left: 52px;
+  border: 0; border-radius: var(--radius-pill); box-shadow: var(--shadow);
+}
+.search-field input:focus { box-shadow: 0 0 0 3px var(--color-primary), var(--shadow); }
+
+/* ---------- 7. 카드 · 칩 · 탭 · 정보칸 ---------- */
+.card { background: var(--color-white); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.card-soft { background: var(--color-surface); border-radius: var(--radius); padding: 24px; }
+.cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+
+/* 키워드 칩 (BRAND KEYWORDS) */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 7px 18px;
+  background: var(--color-chip); color: var(--color-text);
+  border-radius: var(--radius-pill); font-size: 15px; font-weight: 600;
+}
+/* 거래 배지 (전세 · 월세 · 매매) — DESIGN.md badge-deal */
+.badge {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 6px;
+  background: var(--color-sub); color: var(--color-primary);
+  border-radius: 4px; font-size: 12px; font-weight: 700; line-height: 1;
+}
+/* 평점 칩 (★ 4.7) · 3D 배지 — DESIGN.md badge-3d */
+.chip-soft { background: var(--color-surface); padding: 6px 12px; font-size: 14px; }
+.chip-soft .star { color: var(--color-star); }
+
+/* 탭 (정보 · 평면도 · 최근 실거래가) — 상세 페이지에서 쓰세요 */
+.tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--color-border); margin-bottom: 20px; }
+.tabs a, .tabs button {
+  min-height: 44px; padding: 0 2px; background: none; color: var(--color-text-desc);
+  border: 0; border-bottom: 3px solid transparent; border-radius: 0;
+  font-weight: 600; text-decoration: none; display: inline-flex; align-items: center;
+}
+.tabs a:hover, .tabs button:hover { background: none; color: var(--color-text); }
+.tabs [aria-current="page"], .tabs [aria-selected="true"] { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+/* 정보칸 (세대수 2,990세대 · 준공연도 2019년) — 상세 페이지에서 쓰세요 */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.stat { text-align: center; padding: 8px 12px; }
+.stat + .stat { border-left: 1px solid var(--color-border); }
+.stat svg { width: 24px; height: 24px; color: var(--color-text); margin: 0 auto 6px; }
+.stat-label { display: block; font-size: 13px; color: var(--color-text-desc); }
+.stat-value { display: block; font-size: 16px; font-weight: 600; }
+
+/* ---------- 8. 안내 문구 · 푸터 ---------- */
+.flash { background: var(--color-success-bg); color: var(--color-success); padding: 12px 16px; border-radius: var(--radius-sm); font-weight: 600; }
+.todo { color: var(--color-text-desc); font-size: 14px; }
+.foot { text-align: center; color: var(--color-text-desc); font-size: 14px; padding: 32px 20px; background: var(--color-neutral); }
+.foot strong { color: var(--color-text-sub); }
+
+/* =========================================================
+   ① 홈 전용 (home.html)
+   ========================================================= */
+
+/* 히어로 — 가이드 메인 배너: 하늘 + 도시 사진, 흰 로고 · 흰 글자 · 흰 알약 버튼 */
+.hero {
+  position: relative; overflow: hidden;
+  min-height: 480px;
+  padding: clamp(32px, 5vw, 48px) clamp(24px, 5vw, 48px) clamp(32px, 5vw, 44px);
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  background: linear-gradient(180deg, var(--sky-top) 0%, #5C97FC 45%, var(--sky-bottom) 100%);
+  display: flex; flex-direction: column;
+}
+.hero-city {                               /* 가이드 원본에서 가져온 도시 사진 */
+  position: absolute; right: 0; bottom: 0; height: 62%; width: auto; max-width: none;
+  /* 왼쪽 · 위쪽 가장자리를 하늘에 자연스럽게 녹임 */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%), linear-gradient(180deg, transparent 0, #000 35%);
+  -webkit-mask-composite: source-in;
+          mask-image: linear-gradient(90deg, transparent 0, #000 22%), linear-gradient(180deg, transparent 0, #000 35%);
+          mask-composite: intersect;
+  pointer-events: none;
+}
+.hero::after {                             /* 왼쪽 글자가 잘 읽히도록 하늘색 그늘 */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(69,137,252,.55) 0%, rgba(69,137,252,0) 55%);
+}
+.hero > *:not(.hero-city) { position: relative; z-index: 1; }
+.hero .logo { margin-bottom: clamp(32px, 6vw, 56px); }
+.hero .logo-mark { height: 46px; }
+.hero .logo-ko { font-size: 34px; }
+.hero .logo-en { font-size: 9.5px; }
+.hero h1 { color: var(--color-white); font-weight: 700; margin-bottom: 18px; text-shadow: 0 2px 12px rgba(0, 40, 120, .18); }
+.hero-sub { font-size: clamp(17px, 2vw, 20px); margin-bottom: 28px; text-shadow: 0 1px 8px rgba(0, 40, 120, .18); }
+.hero .btn-white { align-self: flex-start; min-height: 52px; padding: 0 26px; margin-top: auto; }
+
+/* 검색창 (앱 지도 화면의 검색창) */
+.home-search { max-width: 720px; margin: 28px auto 0; }
+
+/* 기능 카드 3개 — 연한 면, 테두리 없음, 파란 선 아이콘 */
+.features { list-style: none; padding: 0; margin: 28px 0 64px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.feature { text-align: center; padding: 32px 20px 28px; }
+.feature svg { width: 40px; height: 40px; color: var(--color-primary); margin: 0 auto 16px; }
+.feature h3 { font-size: 19px; margin-bottom: 6px; }
+.feature p { color: var(--color-text-desc); font-size: 15px; margin: 0; }
+
+/* 대표 매물 — 앱 화면의 '래미안 원베일리' 카드 */
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
+.section-head h2 { margin: 0; }
+.section-head a { font-weight: 600; text-decoration: none; }
+
+.listing-card { padding: 12px; transition: transform .2s, box-shadow .2s; }
+.listing-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.listing-card a { display: flex; gap: 16px; color: inherit; text-decoration: none; align-items: stretch; }
+.listing-thumb {
+  width: 46%; aspect-ratio: 4 / 3; flex-shrink: 0; overflow: hidden;
+  border-radius: 14px; background: var(--color-sub); color: var(--color-primary);
+  display: grid; place-items: center;
+}
+.listing-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.listing-thumb svg { width: 44px; height: auto; opacity: .45; }
+.listing-body { flex: 1; display: flex; flex-direction: column; padding: 6px 4px 2px 0; min-width: 0; }
+.listing-body h3 { font-size: 19px; margin-bottom: 4px; }
+.listing-region { color: var(--color-text-desc); font-size: 15px; margin: 0 0 4px; }
+.listing-price { font-weight: 700; color: var(--color-primary); margin: 0; }
+.listing-body .chip { align-self: flex-end; margin-top: auto; }
+.empty { padding: 32px; text-align: center; color: var(--color-text-desc); }
+
+/* 브랜드 패널 — 가이드 오른쪽 BRAND KEYWORDS · BRAND CONCEPT · BRAND MOOD */
+.brand-panel { margin-top: 64px; display: grid; gap: 32px; grid-template-columns: 1fr 1.2fr 1fr; padding: 32px; }
+.brand-panel > div + div { border-left: 1px solid var(--color-border); padding-left: 32px; }
+.keywords { display: flex; flex-wrap: wrap; gap: 10px; }
+.concept { text-align: center; }
+.concept-roof { width: 100px; height: 34px; margin: 4px auto 14px; color: var(--color-primary); }
+.concept h2 { font-size: 26px; }
+.concept p { color: var(--color-text-sub); margin: 0; }
+.mood { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mood img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; }
+
+/* ---------- 404 · 500 ---------- */
+.status-page { text-align: center; padding: 64px 20px; }
+.status-icon { width: 104px; height: 104px; margin: 0 auto 24px; filter: drop-shadow(0 8px 20px rgba(24,27,37,.10)); }
+.status-code { color: var(--color-primary); font-weight: 700; letter-spacing: .1em; margin-bottom: 8px; }
+.status-page p { color: var(--color-text-desc); }
+.status-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+
+/* ---------- 반응형 · 모션 줄이기 ---------- */
+@media (max-width: 860px) {
+  .brand-panel { grid-template-columns: 1fr; }
+  .brand-panel > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--color-border); padding-top: 28px; }
+}
+@media (max-width: 640px) {
+  .nav { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .nav nav a { padding: 8px 12px; font-size: 14px; }
+  .hero { min-height: 560px; }
+  .hero-city { height: 40%; }
+  .hero::after { background: linear-gradient(180deg, rgba(69,137,252,.35) 0%, rgba(69,137,252,0) 60%); }
+  .cards { grid-template-columns: 1fr; }
+  .search-field input { font-size: 15px; }
+  .brand-panel { padding: 24px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
