@@ -192,9 +192,13 @@ components:
   listing-card:
     backgroundColor: "{colors.bg-base}"
     textColor: "{colors.text-primary}"
-    titleSize: 19px
+    titleSize: 17px
     rounded: "{rounded.radius-2xl}"
+    padding: 16px
+    thumbnailSize: 112px
     thumbnailRounded: 14px
+    groupGap: 14px
+    innerGap: 4px
   form-input:
     backgroundColor: "{colors.bg-base}"
     textColor: "{colors.text-primary}"
@@ -225,7 +229,7 @@ components:
 
 로고는 지붕과 벽을 한 획으로 꺾은 집 심볼과 '집결' 워드마크, 그 아래 자간을 넓힌 'ZIPGYEOL'로 이뤄진다. 심볼은 벽 아래 끝이 바깥쪽으로 비스듬히 잘리고, 가운데 네모 창이 하나 있다 [src:0]. 벡터 원본은 `static/brand/logo-mark.svg`이고, 앱 아이콘은 파란 면에 흰 심볼(`app-icon.svg`)과 흰 면에 파란 심볼(`app-icon-white.svg`) 두 가지다. 코드에서는 `templates/_logo.html`의 `{{ logo() }}`, 파란 면 위에서는 `{{ logo(white=True) }}`를 쓴다.
 
-테마는 라이트 하나다. 다크 테마는 정의하지 않는다. 흰 캔버스 `{colors.bg-base}`와 Neutral `{colors.brand-neutral}` 위에서 파랑 `{colors.brand-primary}`이 버튼, 링크, 가격 같은 "눌러야 할 것"과 "봐야 할 숫자"만 맡는다. 메인 배너만 예외로, 하늘 `{colors.sky-top}` → `{colors.sky-bottom}` 그라데이션과 도시 사진 위에 흰 로고와 흰 글자를 올린다 [src:0].
+테마는 라이트 하나다. 다크 테마는 정의하지 않는다. 흰 캔버스 `{colors.bg-base}`와 Neutral `{colors.brand-neutral}` 위에서 파랑 `{colors.brand-primary}`이 버튼, 링크, 가격 같은 "눌러야 할 것"과 "봐야 할 숫자"만 맡는다. 메인 배너만 예외로, 서울 도시 사진 위에 브랜드 파랑 그늘을 깔고 흰 로고와 흰 글자를 올린다 [src:0]. 사진이 안 뜰 때는 하늘 `{colors.sky-top}` → `{colors.sky-bottom}` 그라데이션이 대신 보인다.
 
 ## Colors
 
@@ -283,6 +287,14 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 높이 44px 알약, 글자 15px 600, 색 `{colors.text-secondary}`. hover 배경은 `{colors.brand-sub}`, 글자는 `{colors.brand-primary}`로 바뀐다 (`.nav nav a`).
 
+### nav-badge
+
+메뉴 옆 개수 배지(찜 개수). `{colors.brand-primary}` 원형에 흰 숫자, 높이 20px·최소 폭 20px, 12px 700, 숫자 폭 고정(`tabular-nums`). 1개 이상일 때만 보이고 100개부터는 `99+`. 화면 읽기 프로그램에는 링크의 `aria-label`로 "찜 N개"를 읽힌다 (`.nav-badge`).
+
+```html
+<a class="nav-wish" href="/wishlist" aria-label="찜 3개">찜<span class="nav-badge" aria-hidden="true">3</span></a>
+```
+
 ### search-field
 
 가이드 앱 화면의 검색창이다 [src:0]. 높이 52px 흰 알약에 그림자 `{elevation.shadow-card}`, 테두리 없음, 왼쪽에 20px 돋보기. placeholder는 "지역, 아파트, 지하철역을 검색해보세요"이고 색은 `{colors.text-tertiary}`다. 포커스 시 3px `{colors.brand-primary}` 링을 두른다. 오른쪽에 `icon-button`(필터)을 붙인다 (`.search-bar` · `.search-field`).
@@ -339,11 +351,22 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 ### keyword-chip
 
-`{colors.surface-strong}` 면에 `{colors.text-primary}` 글자, 15px 600, 알약. 가이드 BRAND KEYWORDS 칩이다 [src:0]. 지역·조건 태그에도 쓴다 (`.chip`).
+`{colors.surface-strong}` 면에 `{colors.text-primary}` 글자, 15px 600, 알약. 가이드 BRAND KEYWORDS 칩 모양이다 [src:0]. 지역·조건 태그에 쓴다 (`.chip`).
 
 ### listing-card
 
-가이드 앱 화면의 매물 카드다 [src:0]. 흰 카드(radius 20px, 패딩 12px, 그림자) 안에 왼쪽 사진(폭 46%, 4:3, radius 14px), 오른쪽에 이름(19px 700), 동네·방·면적(`{colors.text-tertiary}`), 가격(`{colors.brand-primary}` 700), 오른쪽 아래 `badge-3d`. 사진이 없으면 `{colors.brand-sub}` 면에 로고 심볼을 옅게 둔다. hover하면 3px 떠오르고 그림자가 짙어진다 (`.card .listing-card`).
+가이드 앱 화면의 매물 카드다 [src:0]. 흰 카드(radius 20px, 안쪽 여백 16px, 그림자) 안에 왼쪽 사진, 오른쪽 글 두 묶음이다. 간격은 게슈탈트 원리로 정한다 (`.card .listing-card`).
+
+| 원리 | 규칙 |
+| --- | --- |
+| 근접성 | 같은 묶음 안은 4~8px(이름↔위치, 배지↔가격), 묶음 사이는 14px — 안쪽 간격의 약 3배라 "어떤 집"과 "얼마"가 나뉘어 읽힌다 |
+| 공통 영역 | 카드 안쪽 여백 16px ≥ 묶음 간격 14px, 카드끼리 20px — 카드 한 장이 한 덩어리로 보인다. "360° 3D"는 사진에 관한 정보라 사진 왼쪽 아래 위에 얹는다 |
+| 유사성 | 사진은 모든 카드에서 112×112px, radius 14px. 거래 유형은 늘 `badge-deal`, 가격은 늘 17px 700 `{colors.brand-primary}` |
+| 정렬 | 사진과 글을 세로 가운데로 맞추고, 같은 줄의 카드는 높이를 같게 한다. 이름은 17px 700, 최대 2줄 |
+
+- 묶음 1 (어떤 집): 이름 → 4px → 동네 · 방 · 면적(14px `{colors.text-tertiary}`)
+- 묶음 2 (얼마): `badge-deal` → 8px → 가격
+- 사진이 없으면 `{colors.brand-sub}` 면에 로고 심볼을 옅게 둔다. hover하면 3px 떠오르고 그림자가 짙어진다.
 
 ### form-input
 
@@ -383,7 +406,7 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 **Don't** 로고를 임의로 변형·재색칠하지 않는다. 심볼은 파랑 또는 흰색 두 가지로만 쓰고, 비율을 늘이거나 획 두께를 바꾸지 않는다 [src:0].
 
-**Don't** 이모지를 아이콘으로 쓰지 않는다. 아이콘은 선 굵기 1.8~2px의 SVG를 `{colors.brand-primary}` 또는 `currentColor`로 칠한다.
+**Don't** 이모지를 아이콘으로 쓰지 않는다. 아이콘은 미니멀 선 아이콘 하나의 규칙만 쓴다 — 24×24 칸, 선 1.5px, 둥근 끝·둥근 꺾임(`stroke-linecap/linejoin: round`), 채우기 없음, 색은 `{colors.brand-primary}` 또는 `currentColor`. 선 아이콘과 꽉 찬(fill) 아이콘을 한 화면에 섞지 않는다. 홈 기능 카드 아이콘(`.feature-icon`)이 기준이다.
 
 ## Responsive Behavior
 
@@ -393,7 +416,7 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 - 브랜드 가이드는 이미지 한 장(`brandguide.png`)이다 [src:0]. 색과 글자색은 이미지에서 뽑았고, 공식 Primary·Sub·Neutral 세 값 외의 색(`brand-chip`, `surface-weak`, 텍스트 네 단계)은 화면 픽셀에서 읽은 값이라 원본 디자인 파일과 조금 다를 수 있다.
 - 로고 벡터(`logo-mark.svg`)는 가이드 이미지를 측정해 다시 그렸다. 원본에서 좌우 벽 아래 끝 높이가 조금 달랐는데, 좌우 대칭으로 맞췄다.
-- 메인 배너 사진(`static/brand/hero-city.jpg`)과 무드 이미지 세 장은 가이드 이미지에서 잘라 해상도가 낮다. 고해상도 원본으로 바꿔야 한다.
+- 메인 배너 사진은 남산타워와 서울 전경(원본 `static/brand/seoul.png`, 1672×941)이다. 화면용으로 JPG 세 장을 만들어 쓴다 — PC `hero-seoul-1672.jpg`·`hero-seoul-1000.jpg`(화면 폭에 맞는 것만 내려받음), 모바일 `hero-seoul-mobile.jpg`(남산타워 중심 세로 자르기). 원본보다 크게 늘리지 않는다. 배너 전체를 `object-fit: cover`로 채우고, 글자 쪽(PC 왼쪽, 모바일 위쪽)에 브랜드 파랑 그늘을 깐다. 사진을 바꿀 땐 가로 1600px 이상 사진을 쓴다.
 - 경고(warning) 색과 다크 테마는 정하지 않았다.
 - 매물 목록, 상세+3D, 의뢰서, 찜 화면은 각 담당자가 만들면서 이 문서의 컴포넌트를 쓴다. 새 컴포넌트가 필요하면 원님에게 말해 이 문서와 `style.css`에 함께 추가한다.
 - 키보드 포커스는 `:focus-visible`에 3px `{colors.brand-primary}` 외곽선으로 표시한다. outline을 끄지 않는다.
