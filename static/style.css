@@ -95,6 +95,15 @@ img { max-width: 100%; display: block; }
   transition: background .15s, color .15s;
 }
 .nav nav a:hover { background: var(--color-sub); color: var(--color-primary); }
+/* 찜 개수 배지 — 프라이머리 원형, 1개 이상일 때만 보임 */
+.nav-wish { display: inline-flex; align-items: center; gap: 6px; }
+.nav-badge {
+  display: inline-grid; place-items: center;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  background: var(--color-primary); color: var(--color-white);
+  border-radius: var(--radius-pill);
+  font-size: 12px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;
+}
 
 /* ---------- 5. 버튼 ---------- */
 .btn, button {

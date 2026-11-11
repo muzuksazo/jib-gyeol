@@ -287,6 +287,14 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 높이 44px 알약, 글자 15px 600, 색 `{colors.text-secondary}`. hover 배경은 `{colors.brand-sub}`, 글자는 `{colors.brand-primary}`로 바뀐다 (`.nav nav a`).
 
+### nav-badge
+
+메뉴 옆 개수 배지(찜 개수). `{colors.brand-primary}` 원형에 흰 숫자, 높이 20px·최소 폭 20px, 12px 700, 숫자 폭 고정(`tabular-nums`). 1개 이상일 때만 보이고 100개부터는 `99+`. 화면 읽기 프로그램에는 링크의 `aria-label`로 "찜 N개"를 읽힌다 (`.nav-badge`).
+
+```html
+<a class="nav-wish" href="/wishlist" aria-label="찜 3개">찜<span class="nav-badge" aria-hidden="true">3</span></a>
+```
+
 ### search-field
 
 가이드 앱 화면의 검색창이다 [src:0]. 높이 52px 흰 알약에 그림자 `{elevation.shadow-card}`, 테두리 없음, 왼쪽에 20px 돋보기. placeholder는 "지역, 아파트, 지하철역을 검색해보세요"이고 색은 `{colors.text-tertiary}`다. 포커스 시 3px `{colors.brand-primary}` 링을 두른다. 오른쪽에 `icon-button`(필터)을 붙인다 (`.search-bar` · `.search-field`).

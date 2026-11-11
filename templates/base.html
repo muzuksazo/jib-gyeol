@@ -30,7 +30,10 @@
     <nav aria-label="주 메뉴">
       <a href="{{ url_for('listings.index') }}">매물 보기</a>
       <a href="{{ url_for('request_form.form') }}">의뢰서 남기기</a>
-      <a href="{{ url_for('wishlist.index') }}">찜 ({{ session.get('wish', [])|length }})</a>
+      {% set wish_count = session.get('wish', [])|length %}
+      <a class="nav-wish" href="{{ url_for('wishlist.index') }}" aria-label="찜 {{ wish_count }}개">
+        찜{% if wish_count %}<span class="nav-badge" aria-hidden="true">{{ wish_count if wish_count < 100 else '99+' }}</span>{% endif %}
+      </a>
     </nav>
   </header>
 
