@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{# ⑤ 찜 · 비교 — 담당: PO #}
+{% block title %}찜 목록{% endblock %}
+{% block content %}
+<h1>찜 목록</h1>
+<ul class="cards">
+  {% for item in items %}
+  <li><a href="{{ url_for('detail.show', listing_id=item.id) }}">{{ item.title }}</a> · {{ item.region }} · {{ item.deal_type }} {{ item.price }}만</li>
+  {% else %}
+  <li>아직 찜한 매물이 없어요. <a href="{{ url_for('listings.index') }}">매물 보러 가기</a></li>
+  {% endfor %}
+</ul>
+<p class="todo">TODO(PO): 찜한 매물 나란히 비교하기</p>
+{% endblock %}

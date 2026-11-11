@@ -1,0 +1,28 @@
+<!doctype html>
+<!-- base.html — 공통 틀 (담당: 원님). 메뉴 · 안내 문구 · 스타일은 여기서 한 번에 -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}jib-gyeol{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="nav">
+    <a class="logo" href="{{ url_for('home.index') }}">jib-gyeol</a>  {# TODO(원님): 서비스 이름 · 로고 #}
+    <nav>
+      <a href="{{ url_for('listings.index') }}">매물 보기</a>
+      <a href="{{ url_for('request_form.form') }}">의뢰서 남기기</a>
+      <a href="{{ url_for('wishlist.index') }}">찜 ({{ session.get('wish', [])|length }})</a>
+    </nav>
+  </header>
+
+  <main>
+    {% for m in get_flashed_messages() %}<p class="flash" role="status">{{ m }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="foot">가상 서비스 · D21 팀 프로젝트</footer>
+</body>
+</html>

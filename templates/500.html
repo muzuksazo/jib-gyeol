@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{# 500 — 디자인: 원님. 서버 코드 에러일 때 #}
+{% block title %}잠시 문제가 생겼어요{% endblock %}
+{% block content %}
+<h1>잠시 문제가 생겼어요</h1>
+<p>우리 쪽 실수예요. 잠시 뒤 다시 시도해 주세요.</p>
+<p><a href="{{ url_for('home.index') }}">홈으로</a></p>
+{% endblock %}

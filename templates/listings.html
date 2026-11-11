@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{# ② 매물 목록 — 담당: 여님 #}
+{% block title %}매물 보기{% endblock %}
+{% block content %}
+<h1>매물 보기</h1>
+<form method="get">
+  <input name="region" value="{{ region }}" placeholder="지역" aria-label="지역">
+  {# TODO(여님): 거래 유형 · 가격 · 방 수 필터 #}
+  <button>찾기</button>
+</form>
+
+<ul class="cards">
+  {% for item in items %}
+  <li>
+    <a href="{{ url_for('detail.show', listing_id=item.id) }}">{{ item.title }}</a>
+    · {{ item.region }} · {{ item.deal_type }} {{ item.price }}만{% if item.monthly_rent %}/{{ item.monthly_rent }}만{% endif %}
+    · 방 {{ item.rooms }}개
+  </li>
+  {% else %}
+  <li>조건에 맞는 매물이 없어요. 조건을 바꿔 보세요.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{# ③ 매물 상세 + 3D — 담당: 팀원 A #}
+{% block title %}{{ listing.title }}{% endblock %}
+{% block content %}
+<h1>{{ listing.title }}</h1>
+<p>{{ listing.region }} · {{ listing.deal_type }} {{ listing.price }}만{% if listing.monthly_rent %}/{{ listing.monthly_rent }}만{% endif %}
+   · 방 {{ listing.rooms }}개 · {{ listing.area_m2 }}㎡ · {{ listing.floor }}층</p>
+<p>{{ listing.description }}</p>
+
+<section class="viewer" aria-label="3D 둘러보기">
+  {% if listing.splat_url %}
+    {# TODO(팀원 A): 가우시안 스플래팅 웹 뷰어로 listing.splat_url 파일 띄우기 #}
+    <p>3D 파일: {{ listing.splat_url }}</p>
+  {% else %}
+    <p>이 매물은 아직 3D 둘러보기가 준비되지 않았어요.</p>
+  {% endif %}
+</section>
+
+<form method="post" action="{{ url_for('wishlist.toggle', listing_id=listing.id) }}">
+  <button>{% if listing.id in session.get('wish', []) %}♥ 찜 취소{% else %}♡ 찜하기{% endif %}</button>
+</form>
+{% endblock %}
