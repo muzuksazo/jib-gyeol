@@ -12,7 +12,15 @@
 {% block content %}
 {# 메인 배너 — 가이드 그대로: 흰 로고 · 슬로건 · 서브 문구 · 흰 알약 버튼 #}
 <section class="hero">
-  <img class="hero-city" src="{{ url_for('static', filename='brand/hero-city.jpg') }}" alt="">
+  {# 서울 사진: 모바일은 남산타워 세로 사진, PC는 화면 폭에 맞는 크기만 내려받음 (원본보다 크게 늘리지 않음) #}
+  <picture>
+    <source media="(max-width: 640px)" srcset="{{ url_for('static', filename='brand/hero-seoul-mobile.jpg') }}">
+    <img class="hero-city"
+         src="{{ url_for('static', filename='brand/hero-seoul-1672.jpg') }}"
+         srcset="{{ url_for('static', filename='brand/hero-seoul-1000.jpg') }} 1000w, {{ url_for('static', filename='brand/hero-seoul-1672.jpg') }} 1672w"
+         sizes="(max-width: 1120px) 100vw, 1080px"
+         width="1672" height="941" alt="" fetchpriority="high">
+  </picture>
   {{ logo(white=True) }}
   <h1>집 정보가 한곳에 모이다,<br>집의 결을 볼 수 있다.</h1>
   <p class="hero-sub">지금, 집결과 함께<br>온라인으로 임장해보세요.</p>
@@ -36,17 +44,32 @@
 {# 기능 카드 3개 — 가이드 문구 그대로 #}
 <ul class="features">
   <li class="card-soft feature">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20.5H14.5V15h-5v5.5H3.5z"/></svg>
+    {# 아이콘: 뷰파인더 안의 집 (화면으로 집을 본다) #}
+    <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/>
+      <path d="M7.5 16.5v-4.6L12 8.5l4.5 3.4v4.6"/>
+      <path d="M11 13.5h2v2h-2z"/>
+    </svg>
     <h3>온라인 임장</h3>
     <p>집을 직접 방문한 듯,<br>생생하게</p>
   </li>
   <li class="card-soft feature">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5s-7-6.6-7-12a7 7 0 0 1 14 0c0 5.4-7 12-7 12z"/></svg>
+    {# 아이콘: 지도 핀 + 바닥 그림자 (지도 위 위치) #}
+    <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 17.5s-5.5-5-5.5-9.25a5.5 5.5 0 0 1 11 0C17.5 12.5 12 17.5 12 17.5z"/>
+      <circle cx="12" cy="8.25" r="2"/>
+      <path d="M8 18.6c-2.4.4-4 1.1-4 1.9 0 1.1 3.6 2 8 2s8-.9 8-2c0-.8-1.6-1.5-4-1.9"/>
+    </svg>
     <h3>한눈에 보는 정보</h3>
     <p>지도와 함께하는<br>편리한 부동산 탐색</p>
   </li>
   <li class="card-soft feature">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="13" width="3.6" height="8" rx="1.2"/><rect x="10.2" y="8" width="3.6" height="13" rx="1.2"/><rect x="16.4" y="3" width="3.6" height="18" rx="1.2"/></svg>
+    {# 아이콘: 축 위의 오르는 추세선 (시세 흐름) #}
+    <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3.5 3.5v14a3 3 0 0 0 3 3h14"/>
+      <path d="m7.5 15 3.5-4 3 2.5 5-6"/>
+      <path d="M15.5 7.5H19V11"/>
+    </svg>
     <h3>더 깊은 분석</h3>
     <p>시세와 트렌드까지,<br>한눈에</p>
   </li>
@@ -83,28 +106,4 @@
   </ul>
 </section>
 
-{# 브랜드 패널 — 가이드 오른쪽 BRAND KEYWORDS · BRAND CONCEPT · BRAND MOOD 그대로 #}
-<section class="card-soft brand-panel" aria-label="집결 브랜드 소개">
-  <div>
-    <p class="label">Brand Keywords</p>
-    <div class="keywords">
-      <span class="chip">신뢰</span><span class="chip">간편함</span><span class="chip">스마트함</span>
-      <span class="chip">부동산</span><span class="chip">정보</span><span class="chip">발견</span>
-    </div>
-  </div>
-  <div class="concept">
-    <p class="label">Brand Concept</p>
-    <svg class="concept-roof" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M2 33V22L50 2l48 20v11"/></svg>
-    <h2>집의 결을 보다</h2>
-    <p>집결은, 수많은 집 정보 속<br>당신의 집을 찾는 여정을 더 쉽고<br>더 명확하게 만듭니다.</p>
-  </div>
-  <div>
-    <p class="label">Brand Mood</p>
-    <div class="mood">
-      <img src="{{ url_for('static', filename='brand/mood-1.jpg') }}" alt="맑은 하늘">
-      <img src="{{ url_for('static', filename='brand/mood-2.jpg') }}" alt="유리 건물">
-      <img src="{{ url_for('static', filename='brand/mood-3.jpg') }}" alt="푸른 그라데이션">
-    </div>
-  </div>
-</section>
 {% endblock %}

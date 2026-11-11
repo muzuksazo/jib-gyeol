@@ -205,20 +205,19 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
   background: linear-gradient(180deg, var(--sky-top) 0%, #5C97FC 45%, var(--sky-bottom) 100%);
   display: flex; flex-direction: column;
 }
-.hero-city {                               /* 가이드 원본에서 가져온 도시 사진 */
-  position: absolute; right: 0; bottom: 0; height: 62%; width: auto; max-width: none;
-  /* 왼쪽 · 위쪽 가장자리를 하늘에 자연스럽게 녹임 */
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%), linear-gradient(180deg, transparent 0, #000 35%);
-  -webkit-mask-composite: source-in;
-          mask-image: linear-gradient(90deg, transparent 0, #000 22%), linear-gradient(180deg, transparent 0, #000 35%);
-          mask-composite: intersect;
+.hero-city {                               /* 서울 도시 사진 — 배너 전체를 채움 */
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: cover;
+  object-position: 50% 12%;                /* 남산타워 꼭대기 · 한강 · 도시가 보이는 위치 */
   pointer-events: none;
 }
-.hero::after {                             /* 왼쪽 글자가 잘 읽히도록 하늘색 그늘 */
+.hero::after {                             /* 왼쪽 글자가 잘 읽히도록 브랜드 파랑 그늘 */
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, rgba(69,137,252,.55) 0%, rgba(69,137,252,0) 55%);
+  background:
+    linear-gradient(90deg, rgba(0,70,209,.78) 0%, rgba(0,86,255,.45) 38%, rgba(0,86,255,0) 68%),
+    linear-gradient(180deg, rgba(69,137,252,.18) 0%, rgba(69,137,252,0) 50%);
 }
-.hero > *:not(.hero-city) { position: relative; z-index: 1; }
+.hero > *:not(picture) { position: relative; z-index: 1; }
 .hero .logo { margin-bottom: clamp(32px, 6vw, 56px); }
 .hero .logo-mark { height: 46px; }
 .hero .logo-ko { font-size: 34px; }
@@ -233,7 +232,12 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 /* 기능 카드 3개 — 연한 면, 테두리 없음, 파란 선 아이콘 */
 .features { list-style: none; padding: 0; margin: 28px 0 64px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .feature { text-align: center; padding: 32px 20px 28px; }
-.feature svg { width: 40px; height: 40px; color: var(--color-primary); margin: 0 auto 16px; }
+/* 기능 아이콘: 미니멀 선 아이콘 — 24칸 · 1.5px 선 · 둥근 끝 (세 개 모두 같은 규칙) */
+.feature-icon {
+  display: block; width: 44px; height: 44px; margin: 0 auto 18px;
+  fill: none; stroke: var(--color-primary); stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 .feature h3 { font-size: 19px; margin-bottom: 6px; }
 .feature p { color: var(--color-text-desc); font-size: 15px; margin: 0; }
 
@@ -259,17 +263,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .listing-body .chip { align-self: flex-end; margin-top: auto; }
 .empty { padding: 32px; text-align: center; color: var(--color-text-desc); }
 
-/* 브랜드 패널 — 가이드 오른쪽 BRAND KEYWORDS · BRAND CONCEPT · BRAND MOOD */
-.brand-panel { margin-top: 64px; display: grid; gap: 32px; grid-template-columns: 1fr 1.2fr 1fr; padding: 32px; }
-.brand-panel > div + div { border-left: 1px solid var(--color-border); padding-left: 32px; }
-.keywords { display: flex; flex-wrap: wrap; gap: 10px; }
-.concept { text-align: center; }
-.concept-roof { width: 100px; height: 34px; margin: 4px auto 14px; color: var(--color-primary); }
-.concept h2 { font-size: 26px; }
-.concept p { color: var(--color-text-sub); margin: 0; }
-.mood { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.mood img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; }
-
 /* ---------- 404 · 500 ---------- */
 .status-page { text-align: center; padding: 64px 20px; }
 .status-icon { width: 104px; height: 104px; margin: 0 auto 24px; filter: drop-shadow(0 8px 20px rgba(24,27,37,.10)); }
@@ -278,18 +271,13 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--c
 .status-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
 
 /* ---------- 반응형 · 모션 줄이기 ---------- */
-@media (max-width: 860px) {
-  .brand-panel { grid-template-columns: 1fr; }
-  .brand-panel > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--color-border); padding-top: 28px; }
-}
 @media (max-width: 640px) {
   .nav { flex-direction: column; align-items: flex-start; gap: 8px; }
   .nav nav a { padding: 8px 12px; font-size: 14px; }
   .hero { min-height: 560px; }
-  .hero-city { height: 40%; }
-  .hero::after { background: linear-gradient(180deg, rgba(69,137,252,.35) 0%, rgba(69,137,252,0) 60%); }
+  .hero-city { object-position: 60% 30%; }    /* 세로 화면: 남산타워 세로 사진 */
+  .hero::after { background: linear-gradient(180deg, rgba(0,70,209,.80) 0%, rgba(0,86,255,.55) 50%, rgba(0,86,255,0) 78%); }
   .cards { grid-template-columns: 1fr; }
   .search-field input { font-size: 15px; }
-  .brand-panel { padding: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

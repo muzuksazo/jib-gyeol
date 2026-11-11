@@ -225,7 +225,7 @@ components:
 
 로고는 지붕과 벽을 한 획으로 꺾은 집 심볼과 '집결' 워드마크, 그 아래 자간을 넓힌 'ZIPGYEOL'로 이뤄진다. 심볼은 벽 아래 끝이 바깥쪽으로 비스듬히 잘리고, 가운데 네모 창이 하나 있다 [src:0]. 벡터 원본은 `static/brand/logo-mark.svg`이고, 앱 아이콘은 파란 면에 흰 심볼(`app-icon.svg`)과 흰 면에 파란 심볼(`app-icon-white.svg`) 두 가지다. 코드에서는 `templates/_logo.html`의 `{{ logo() }}`, 파란 면 위에서는 `{{ logo(white=True) }}`를 쓴다.
 
-테마는 라이트 하나다. 다크 테마는 정의하지 않는다. 흰 캔버스 `{colors.bg-base}`와 Neutral `{colors.brand-neutral}` 위에서 파랑 `{colors.brand-primary}`이 버튼, 링크, 가격 같은 "눌러야 할 것"과 "봐야 할 숫자"만 맡는다. 메인 배너만 예외로, 하늘 `{colors.sky-top}` → `{colors.sky-bottom}` 그라데이션과 도시 사진 위에 흰 로고와 흰 글자를 올린다 [src:0].
+테마는 라이트 하나다. 다크 테마는 정의하지 않는다. 흰 캔버스 `{colors.bg-base}`와 Neutral `{colors.brand-neutral}` 위에서 파랑 `{colors.brand-primary}`이 버튼, 링크, 가격 같은 "눌러야 할 것"과 "봐야 할 숫자"만 맡는다. 메인 배너만 예외로, 서울 도시 사진 위에 브랜드 파랑 그늘을 깔고 흰 로고와 흰 글자를 올린다 [src:0]. 사진이 안 뜰 때는 하늘 `{colors.sky-top}` → `{colors.sky-bottom}` 그라데이션이 대신 보인다.
 
 ## Colors
 
@@ -339,7 +339,7 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 ### keyword-chip
 
-`{colors.surface-strong}` 면에 `{colors.text-primary}` 글자, 15px 600, 알약. 가이드 BRAND KEYWORDS 칩이다 [src:0]. 지역·조건 태그에도 쓴다 (`.chip`).
+`{colors.surface-strong}` 면에 `{colors.text-primary}` 글자, 15px 600, 알약. 가이드 BRAND KEYWORDS 칩 모양이다 [src:0]. 지역·조건 태그에 쓴다 (`.chip`).
 
 ### listing-card
 
@@ -383,7 +383,7 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 **Don't** 로고를 임의로 변형·재색칠하지 않는다. 심볼은 파랑 또는 흰색 두 가지로만 쓰고, 비율을 늘이거나 획 두께를 바꾸지 않는다 [src:0].
 
-**Don't** 이모지를 아이콘으로 쓰지 않는다. 아이콘은 선 굵기 1.8~2px의 SVG를 `{colors.brand-primary}` 또는 `currentColor`로 칠한다.
+**Don't** 이모지를 아이콘으로 쓰지 않는다. 아이콘은 미니멀 선 아이콘 하나의 규칙만 쓴다 — 24×24 칸, 선 1.5px, 둥근 끝·둥근 꺾임(`stroke-linecap/linejoin: round`), 채우기 없음, 색은 `{colors.brand-primary}` 또는 `currentColor`. 선 아이콘과 꽉 찬(fill) 아이콘을 한 화면에 섞지 않는다. 홈 기능 카드 아이콘(`.feature-icon`)이 기준이다.
 
 ## Responsive Behavior
 
@@ -393,7 +393,7 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 - 브랜드 가이드는 이미지 한 장(`brandguide.png`)이다 [src:0]. 색과 글자색은 이미지에서 뽑았고, 공식 Primary·Sub·Neutral 세 값 외의 색(`brand-chip`, `surface-weak`, 텍스트 네 단계)은 화면 픽셀에서 읽은 값이라 원본 디자인 파일과 조금 다를 수 있다.
 - 로고 벡터(`logo-mark.svg`)는 가이드 이미지를 측정해 다시 그렸다. 원본에서 좌우 벽 아래 끝 높이가 조금 달랐는데, 좌우 대칭으로 맞췄다.
-- 메인 배너 사진(`static/brand/hero-city.jpg`)과 무드 이미지 세 장은 가이드 이미지에서 잘라 해상도가 낮다. 고해상도 원본으로 바꿔야 한다.
+- 메인 배너 사진은 남산타워와 서울 전경(원본 `static/brand/seoul.png`, 1672×941)이다. 화면용으로 JPG 세 장을 만들어 쓴다 — PC `hero-seoul-1672.jpg`·`hero-seoul-1000.jpg`(화면 폭에 맞는 것만 내려받음), 모바일 `hero-seoul-mobile.jpg`(남산타워 중심 세로 자르기). 원본보다 크게 늘리지 않는다. 배너 전체를 `object-fit: cover`로 채우고, 글자 쪽(PC 왼쪽, 모바일 위쪽)에 브랜드 파랑 그늘을 깐다. 사진을 바꿀 땐 가로 1600px 이상 사진을 쓴다.
 - 경고(warning) 색과 다크 테마는 정하지 않았다.
 - 매물 목록, 상세+3D, 의뢰서, 찜 화면은 각 담당자가 만들면서 이 문서의 컴포넌트를 쓴다. 새 컴포넌트가 필요하면 원님에게 말해 이 문서와 `style.css`에 함께 추가한다.
 - 키보드 포커스는 `:focus-visible`에 3px `{colors.brand-primary}` 외곽선으로 표시한다. outline을 끄지 않는다.
