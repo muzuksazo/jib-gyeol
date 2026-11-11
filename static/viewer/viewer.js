@@ -2,6 +2,7 @@
 //
 // 쓰는 법: <section class="viewer" data-splat-url=".../lod-meta.json"> 안에 템플릿의 요소들을 두면 된다.
 // lod-meta.json 옆에 nav.json · nav.png · map.png (tools/build_nav.py가 만든다)가 있으면
+// (방 이름은 rooms.json에 사람이 적는다)
 // 미니맵과 '걸을 수 있는 바닥' 제한이 켜진다. 없으면 드래그 둘러보기만 된다.
 //
 // 스플랫 로딩·LOD 설정 기준: PlayCanvas 공식 예제 gaussian-splatting/streamed-sog
@@ -294,6 +295,17 @@ async function start(root) {
             node.style.top = `${((z - area.minZ) / area.sizeZ) * 100}%`;
         };
         mm.place = place;
+        // 방 이름: 장면 폴더의 rooms.json([{ name, x, z }])이 있으면 미니맵에 적는다 (사람이 적는 파일)
+        fetch(`${baseUrl}rooms.json`).then((r) => (r.ok ? r.json() : [])).then((rooms) => {
+            for (const room of rooms) {
+                const label = document.createElement('span');
+                label.className = 'mm-room';
+                label.textContent = room.name;
+                place(label, room.x, room.z);
+                minimap.insertBefore(label, mm.ghost);
+            }
+        }).catch(() => {});
+
         minimap.addEventListener('pointermove', (e) => {
             const point = toWorld(e);
             mm.ghost.hidden = !point;
