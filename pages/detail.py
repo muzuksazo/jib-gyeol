@@ -10,9 +10,22 @@ import db
 bp = Blueprint("detail", __name__)
 
 
+def price_text(listing):
+    """만원 단위 숫자를 읽기 쉬운 글로: 22000 → '2억 2,000만', 월세면 '1,000만 / 월 65만'."""
+    def won(manwon):
+        eok, rest = divmod(manwon, 10000)
+        parts = ([f"{eok}억"] if eok else []) + ([f"{rest:,}만"] if rest or not eok else [])
+        return " ".join(parts)
+
+    text = won(listing["price"])
+    if listing["monthly_rent"]:
+        text += f" / 월 {listing['monthly_rent']:,}만"
+    return text
+
+
 @bp.route("/listings/<int:listing_id>")
 def show(listing_id):
     listing = db.get_listing(listing_id)
     if listing is None:        # 없는 매물 번호 (예: /listings/999)
         abort(404)             # → "없어요" 404 화면 (화면 디자인은 원님의 404.html)
-    return render_template("detail.html", listing=listing)
+    return render_template("detail.html", listing=listing, price_text=price_text(listing))

@@ -1,22 +1,77 @@
 {% extends "base.html" %}
 {# ③ 매물 상세 + 3D — 담당: 여님 (3D 데이터) #}
 {% block title %}{{ listing.title }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='viewer/viewer.css') }}">
+{% if listing.splat_url %}
+{# PlayCanvas 엔진을 'playcanvas' 이름으로 불러오게 묶는다 (viewer.js가 쓴다) #}
+<script type="importmap">
+{ "imports": { "playcanvas": "https://cdn.jsdelivr.net/npm/playcanvas@2.23.3/build/playcanvas.mjs" } }
+</script>
+<script type="module" src="{{ url_for('static', filename='viewer/viewer.js') }}"></script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
-<h1>{{ listing.title }}</h1>
-<p>{{ listing.region }} · {{ listing.deal_type }} {{ listing.price }}만{% if listing.monthly_rent %}/{{ listing.monthly_rent }}만{% endif %}
-   · 방 {{ listing.rooms }}개 · {{ listing.area_m2 }}㎡ · {{ listing.floor }}층</p>
-<p>{{ listing.description }}</p>
+<article class="detail">
+  <a class="detail-back" href="{{ url_for('listings.index') }}">← 매물 목록</a>
 
-<section class="viewer" aria-label="3D 둘러보기">
+  <header class="detail-head">
+    <p class="detail-region">{{ listing.region }}</p>
+    <h1>{{ listing.title }}</h1>
+    <p class="detail-price"><span>{{ listing.deal_type }}</span> {{ price_text }}</p>
+    <ul class="detail-specs">
+      {% if listing.rooms %}<li>방 {{ listing.rooms }}개</li>{% endif %}
+      {% if listing.area_m2 %}<li>{{ listing.area_m2 }}㎡</li>{% endif %}
+      {% if listing.floor %}<li>{{ listing.floor }}층</li>{% endif %}
+    </ul>
+  </header>
+
   {% if listing.splat_url %}
-    {# TODO(여님): 가우시안 스플래팅 웹 뷰어로 listing.splat_url 파일 띄우기 #}
-    <p>3D 파일: {{ listing.splat_url }}</p>
-  {% else %}
-    <p>이 매물은 아직 3D 둘러보기가 준비되지 않았어요.</p>
-  {% endif %}
-</section>
+  <section class="viewer" aria-label="3D 둘러보기" data-splat-url="{{ listing.splat_url }}">
+    <canvas data-el="canvas" tabindex="0" aria-label="3D 공간. 드래그해서 둘러보고, 바닥을 눌러 이동해요."></canvas>
+    <div class="viewer-ring" data-el="ring" hidden></div>
+    <div class="viewer-fade" data-el="fade"></div>
 
-<form method="post" action="{{ url_for('wishlist.toggle', listing_id=listing.id) }}">
-  <button>{% if listing.id in session.get('wish', []) %}♥ 찜 취소{% else %}♡ 찜하기{% endif %}</button>
-</form>
+    <div class="viewer-loading" data-el="loading" role="status" aria-live="polite">
+      <div class="viewer-spinner" aria-hidden="true"></div>
+      <p>집 안을 불러오는 중이에요…</p>
+    </div>
+
+    <p class="viewer-hint" data-el="hint">드래그해서 둘러보고, <b>바닥</b>이나 <b>미니맵</b>을 눌러 이동해요</p>
+
+    <div class="viewer-tools">
+      <button type="button" data-el="reset">처음 위치</button>
+      <button type="button" data-el="wide" aria-pressed="false">넓게 보기</button>
+      <button type="button" data-el="expand" aria-pressed="false">크게 보기</button>
+    </div>
+
+    <div class="viewer-minimap" data-el="minimap" hidden role="group" aria-label="미니맵. 누른 곳으로 이동해요.">
+      <img alt="" draggable="false">
+      <span class="mm-ghost" data-el="ghost" hidden></span>
+      <span class="mm-me" data-el="me"></span>
+    </div>
+
+    <p class="viewer-credit" data-el="credit"></p>
+  </section>
+  {% else %}
+  <section class="viewer viewer-empty" aria-label="3D 둘러보기">
+    <p>이 매물은 아직 3D 둘러보기가 준비되지 않았어요.</p>
+  </section>
+  {% endif %}
+
+  <section class="detail-body">
+    <h2>집 소개</h2>
+    <p>{{ listing.description }}</p>
+  </section>
+
+  <div class="detail-actions">
+    <form method="post" action="{{ url_for('wishlist.toggle', listing_id=listing.id) }}">
+      <button class="btn-wish">{% if listing.id in session.get('wish', []) %}♥ 찜 취소{% else %}♡ 찜하기{% endif %}</button>
+    </form>
+    <a class="btn-primary" href="{{ url_for('request_form.form') }}">이런 집 찾아 달라고 의뢰하기</a>
+  </div>
+</article>
 {% endblock %}
