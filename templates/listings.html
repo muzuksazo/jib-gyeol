@@ -1,59 +1,100 @@
 {% extends "base.html" %}
-{# ② 매물 목록 — 담당: 팀원 A #}
+{# ② 매물 목록 — 담당: 팀원 A · 디자인: 원님 (17:00 기능 동결 뒤 디자인 마무리)
+   필터 name · 값 · 조건 로직은 그대로 두고 화면 배치와 표시만 바꿨어요. #}
 {% block title %}매물 보기{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='listings.css') }}">{% endblock %}
+
+{# 가격 표시: 22000(만원) → 2억 2,000 · 홈 카드와 같은 방식 #}
+{% macro won(p) -%}
+  {%- if p >= 10000 -%}{{ p // 10000 }}억{% if p % 10000 %} {{ '{:,}'.format(p % 10000) }}{% endif %}
+  {%- else -%}{{ '{:,}'.format(p) }}만{%- endif -%}
+{%- endmacro %}
+
 {% block content %}
-<h1>매물 보기</h1>
-<form method="get" class="filters">
-  <label>지역
-    <select name="region">
+<header class="page-head">
+  <div>
+    <h1>매물 보기</h1>
+    <p class="page-sub">지역과 조건으로 찾고, 3D로 미리 둘러보세요.</p>
+  </div>
+</header>
+
+{# 필터 — 한 패널(공통 영역) 안에 같은 모양의 칸 4개(유사성) + 버튼 #}
+<form method="get" class="card-soft filters" role="search" aria-label="매물 조건">
+  <div class="filter-field">
+    <label for="f-region">지역</label>
+    <select id="f-region" name="region">
       <option value="">전체</option>
       {% for r in regions %}
       <option value="{{ r }}" {% if r == filters.region %}selected{% endif %}>{{ r }}</option>
       {% endfor %}
     </select>
-  </label>
-  <label>거래 유형
-    <select name="deal_type">
+  </div>
+  <div class="filter-field">
+    <label for="f-deal">거래 유형</label>
+    <select id="f-deal" name="deal_type">
       <option value="">전체</option>
       {% for d in deal_types %}
       <option value="{{ d }}" {% if d == filters.deal_type %}selected{% endif %}>{{ d }}</option>
       {% endfor %}
     </select>
-  </label>
-  <label>최대 보증금·매매가(만원)
-    <input type="number" name="max_price" min="0" step="500"
+  </div>
+  <div class="filter-field">
+    <label for="f-price">최대 보증금·매매가 <span class="unit">(만원)</span></label>
+    <input id="f-price" type="number" name="max_price" min="0" step="500" inputmode="numeric"
            value="{{ filters.max_price if filters.max_price is not none }}" placeholder="예: 30000">
-  </label>
-  <label>방
-    <select name="rooms">
+  </div>
+  <div class="filter-field">
+    <label for="f-rooms">방</label>
+    <select id="f-rooms" name="rooms">
       <option value="">상관없음</option>
       {% for n in (1, 2, 3) %}
       <option value="{{ n }}" {% if n == filters.rooms %}selected{% endif %}>{{ n }}개 이상</option>
       {% endfor %}
     </select>
-  </label>
-  <button>찾기</button>
-  {% if filtered %}<a href="{{ url_for('listings.index') }}">조건 지우기</a>{% endif %}
+  </div>
+  <div class="filter-actions">
+    <button>찾기</button>
+    {% if filtered %}<a class="btn btn-sub" href="{{ url_for('listings.index') }}">조건 지우기</a>{% endif %}
+  </div>
 </form>
 
-<p>매물 {{ items|length }}개</p>
+{# 결과 개수는 목록 바로 위에 붙임 (근접성: 목록에 속한 정보) #}
+<p class="result-count" role="status">매물 <strong>{{ items|length }}</strong>개</p>
 
-<ul class="cards">
+<ul class="tile-grid">
   {% for item in items %}
-  <li>
-    {% if item.image_url %}
+  <li class="listing-tile">
     <a href="{{ url_for('detail.show', listing_id=item.id) }}">
-      <img src="{{ item.image_url }}" alt="{{ item.title }} 사진" loading="lazy"
-           width="320" height="200" style="display:block;object-fit:cover;max-width:100%;border-radius:8px">
+      {# 사진 묶음: 사진 + 3D 표시 (3D는 사진으로 둘러보기에 관한 정보라 사진 위에) #}
+      <div class="tile-photo">
+        {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="{{ item.title }} 사진" loading="lazy" width="400" height="300">
+        {% else %}
+        <svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
+        {% endif %}
+        {% if item.splat_url %}<span class="listing-3d">360° 3D</span>{% endif %}
+      </div>
+      <div class="tile-body">
+        {# 묶음 1: 어떤 집인지 — 이름 + 위치 · 크기 #}
+        <div class="listing-head">
+          <h2 class="tile-title">{{ item.title }}</h2>
+          <p class="listing-meta">{{ item.region }} · 방 {{ item.rooms }}개{% if item.area_m2 %} · {{ item.area_m2 }}㎡{% endif %}{% if item.floor %} · {{ item.floor }}층{% endif %}</p>
+        </div>
+        {# 묶음 2: 얼마인지 — 거래 유형 + 가격 #}
+        <p class="listing-price">
+          <span class="badge">{{ item.deal_type }}</span>
+          <strong>{{ won(item.price) }}{% if item.monthly_rent %} / {{ item.monthly_rent }}만{% endif %}</strong>
+        </p>
+      </div>
     </a>
-    {% endif %}
-    <a href="{{ url_for('detail.show', listing_id=item.id) }}">{{ item.title }}</a>
-    {% if item.splat_url %}<strong>· 3D 둘러보기</strong>{% endif %}
-    · {{ item.region }} · {{ item.deal_type }} {{ item.price }}만{% if item.monthly_rent %}/{{ item.monthly_rent }}만{% endif %}
-    · 방 {{ item.rooms }}개{% if item.area_m2 %} · {{ item.area_m2 }}㎡{% endif %}
   </li>
   {% else %}
-  <li>조건에 맞는 매물이 없어요. 조건을 바꿔 보세요.</li>
+  <li class="card empty-state">
+    <svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
+    <p class="empty-title">조건에 맞는 매물이 없어요.</p>
+    <p class="empty-desc">조건을 바꿔 보세요.</p>
+    <a class="btn btn-sub" href="{{ url_for('listings.index') }}">조건 지우기</a>
+  </li>
   {% endfor %}
 </ul>
 {% endblock %}

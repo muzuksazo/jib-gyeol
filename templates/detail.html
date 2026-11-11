@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {# ③ 매물 상세 + 3D — 담당: 여님 (3D 데이터)
    디자인은 DESIGN.md의 공통 컴포넌트를 써요: .badge · .chip · .tabs · .stats · .btn · .card-soft
-   이 페이지에만 필요한 모양(3D 뷰어 · 평면도)은 static/viewer/viewer.css 에 있어요. #}
+   이 페이지에만 필요한 모양(3D 뷰어 · 평면도)은 static/viewer/viewer.css 에 있어요.
+   디자인: 원님 (기능 동결 뒤 마무리) — 3D 뷰어 · 미니맵 · 탭 · 찜 토스트 스크립트와 data-* 는 그대로, 배치만 바꿈 #}
 {% block title %}{{ listing.title }} · 집결{% endblock %}
 
 {% block head %}
@@ -50,22 +51,29 @@
     <p class="viewer-credit" data-el="credit"></p>
   </section>
   {% else %}
+  {% if listing.image_url %}
+  <figure class="detail-photo">
+    <img src="{{ listing.image_url }}" alt="{{ listing.title }} 사진">
+    <figcaption class="listing-3d">3D 둘러보기 준비 중</figcaption>
+  </figure>
+  {% else %}
   <section class="viewer-empty card-soft" aria-label="3D 둘러보기">
     <svg class="logo-mark" viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
     <p>이 매물은 아직 3D 둘러보기가 준비되지 않았어요.</p>
   </section>
   {% endif %}
+  {% endif %}
 
-  <header class="detail-head">
-    <div class="detail-head-text">
-      <p class="detail-tags">
-        <span class="badge">{{ listing.deal_type }}</span>
-        {% if listing.splat_url %}<span class="chip chip-soft">360° 3D</span>{% endif %}
-      </p>
-      <h1>{{ listing.title }}</h1>
-      <p class="detail-region">{{ listing.region }}</p>
-      <p class="detail-price">{{ price_text }}</p>
-    </div>
+  <div class="detail-body">
+  {# 요약 카드 — 어떤 집(이름 · 위치) / 얼마(거래 배지 · 가격) / 행동(찜 · 의뢰) 세 묶음 #}
+  <aside class="card detail-summary" aria-label="매물 요약">
+    <header class="detail-head">
+      <div class="detail-head-text">
+        <h1>{{ listing.title }}</h1>
+        <p class="detail-region">{{ listing.region }}{% if listing.splat_url %} · 360° 3D{% endif %}</p>
+      </div>
+      <p class="detail-price"><span class="badge">{{ listing.deal_type }}</span><strong>{{ price_text }}</strong></p>
+    </header>
 
     {# 찜 · 의뢰 — 찜은 페이지를 새로 불러오지 않고 토스트로 알려요 (스크립트가 꺼져 있으면 보통 폼으로 동작) #}
     <div class="detail-actions">
@@ -78,10 +86,11 @@
       </form>
       <a class="btn" href="{{ url_for('request_form.form') }}">의뢰하기</a>
     </div>
-  </header>
+  </aside>
 
   <div class="detail-toast" data-toast role="status" aria-live="polite"></div>
 
+  <div class="detail-main">
   <div class="tabs" role="tablist" data-tabs>
     <button type="button" role="tab" id="tab-info" aria-controls="panel-info" aria-selected="true">정보</button>
     {% if plan_url %}<button type="button" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false">평면도</button>{% endif %}
@@ -126,6 +135,8 @@
     </figure>
   </section>
   {% endif %}
+  </div>{# /detail-main #}
+  </div>{# /detail-body #}
 </article>
 
 {# 탭: 누른 탭의 내용만 보여 준다. 스크립트가 꺼져 있으면 '정보'만 보인다. #}
@@ -176,7 +187,10 @@
           if (fresh) button.innerHTML = fresh.innerHTML, button.setAttribute('aria-pressed', fresh.getAttribute('aria-pressed'));
           var freshNav = page.querySelector('.nav a[href$="/wishlist"]');
           var nav = document.querySelector('.nav a[href$="/wishlist"]');
-          if (freshNav && nav) nav.textContent = freshNav.textContent;   // 상단 '찜 (N)' 숫자
+          if (freshNav && nav) {   // 상단 찜 배지 — 글자만 바꾸면 배지(<span class="nav-badge">)가 지워지니 통째로 바꿈
+            nav.innerHTML = freshNav.innerHTML;
+            nav.setAttribute('aria-label', freshNav.getAttribute('aria-label') || '찜');
+          }
           var flash = page.querySelector('.flash');
           showToast(flash ? flash.textContent : '찜 목록을 바꿨어요.');
         })
