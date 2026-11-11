@@ -192,9 +192,13 @@ components:
   listing-card:
     backgroundColor: "{colors.bg-base}"
     textColor: "{colors.text-primary}"
-    titleSize: 19px
+    titleSize: 17px
     rounded: "{rounded.radius-2xl}"
+    padding: 16px
+    thumbnailSize: 112px
     thumbnailRounded: 14px
+    groupGap: 14px
+    innerGap: 4px
   form-input:
     backgroundColor: "{colors.bg-base}"
     textColor: "{colors.text-primary}"
@@ -343,7 +347,18 @@ radius는 2px부터 32px까지 아홉 단계와 `circular`(9999px)다 [src:9]. �
 
 ### listing-card
 
-가이드 앱 화면의 매물 카드다 [src:0]. 흰 카드(radius 20px, 패딩 12px, 그림자) 안에 왼쪽 사진(폭 46%, 4:3, radius 14px), 오른쪽에 이름(19px 700), 동네·방·면적(`{colors.text-tertiary}`), 가격(`{colors.brand-primary}` 700), 오른쪽 아래 `badge-3d`. 사진이 없으면 `{colors.brand-sub}` 면에 로고 심볼을 옅게 둔다. hover하면 3px 떠오르고 그림자가 짙어진다 (`.card .listing-card`).
+가이드 앱 화면의 매물 카드다 [src:0]. 흰 카드(radius 20px, 안쪽 여백 16px, 그림자) 안에 왼쪽 사진, 오른쪽 글 두 묶음이다. 간격은 게슈탈트 원리로 정한다 (`.card .listing-card`).
+
+| 원리 | 규칙 |
+| --- | --- |
+| 근접성 | 같은 묶음 안은 4~8px(이름↔위치, 배지↔가격), 묶음 사이는 14px — 안쪽 간격의 약 3배라 "어떤 집"과 "얼마"가 나뉘어 읽힌다 |
+| 공통 영역 | 카드 안쪽 여백 16px ≥ 묶음 간격 14px, 카드끼리 20px — 카드 한 장이 한 덩어리로 보인다. "360° 3D"는 사진에 관한 정보라 사진 왼쪽 아래 위에 얹는다 |
+| 유사성 | 사진은 모든 카드에서 112×112px, radius 14px. 거래 유형은 늘 `badge-deal`, 가격은 늘 17px 700 `{colors.brand-primary}` |
+| 정렬 | 사진과 글을 세로 가운데로 맞추고, 같은 줄의 카드는 높이를 같게 한다. 이름은 17px 700, 최대 2줄 |
+
+- 묶음 1 (어떤 집): 이름 → 4px → 동네 · 방 · 면적(14px `{colors.text-tertiary}`)
+- 묶음 2 (얼마): `badge-deal` → 8px → 가격
+- 사진이 없으면 `{colors.brand-sub}` 면에 로고 심볼을 옅게 둔다. hover하면 3px 떠오르고 그림자가 짙어진다.
 
 ### form-input
 

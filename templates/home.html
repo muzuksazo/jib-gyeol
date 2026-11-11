@@ -85,18 +85,26 @@
     {% for item in featured %}
     <li class="card listing-card">
       <a href="{{ url_for('detail.show', listing_id=item.id) }}">
+        {# 사진 묶음: 사진 + 3D 표시 (3D는 '사진으로 둘러보기'에 관한 정보라 사진 위에) #}
         <div class="listing-thumb">
           {% if item.image_url %}
             <img src="{{ item.image_url }}" alt="{{ item.title }} 사진" loading="lazy">
           {% else %}
             <svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
           {% endif %}
+          {% if item.splat_url %}<span class="listing-3d">360° 3D</span>{% endif %}
         </div>
         <div class="listing-body">
-          <h3>{{ item.title }}</h3>
-          <p class="listing-region">{{ item.region }}{% if item.rooms %} · 방 {{ item.rooms }}개{% endif %}{% if item.area_m2 %} · {{ item.area_m2 }}㎡{% endif %}</p>
-          <p class="listing-price">{{ item.deal_type }} {{ won(item.price) }}{% if item.deal_type == '월세' and item.monthly_rent %} / {{ item.monthly_rent }}만{% endif %}</p>
-          {% if item.splat_url %}<span class="chip chip-soft">360° 3D</span>{% endif %}
+          {# 묶음 1: 어떤 집인지 — 이름 + 위치·크기 #}
+          <div class="listing-head">
+            <h3>{{ item.title }}</h3>
+            <p class="listing-meta">{{ item.region }}{% if item.rooms %} · 방 {{ item.rooms }}개{% endif %}{% if item.area_m2 %} · {{ item.area_m2 }}㎡{% endif %}</p>
+          </div>
+          {# 묶음 2: 얼마인지 — 거래 유형 + 가격 #}
+          <p class="listing-price">
+            <span class="badge">{{ item.deal_type }}</span>
+            <strong>{{ won(item.price) }}{% if item.deal_type == '월세' and item.monthly_rent %} / {{ item.monthly_rent }}만{% endif %}</strong>
+          </p>
         </div>
       </a>
     </li>
