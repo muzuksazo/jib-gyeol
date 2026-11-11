@@ -147,7 +147,7 @@ html.viewer-expanded { overflow: hidden; }
 /* 미니맵 */
 .viewer-minimap {
     position: absolute; left: 12px; bottom: 12px;
-    width: clamp(130px, 26%, 240px);
+    width: clamp(150px, 34%, 300px);
     border-radius: 12px;
     background: var(--brand-neutral); border: 6px solid var(--brand-neutral);
     box-shadow: 0 4px 18px rgba(0, 40, 120, .22);
@@ -174,7 +174,7 @@ html.viewer-expanded { overflow: hidden; }
 .viewer-credit {
     position: absolute; right: 12px; bottom: 8px; margin: 0;
     font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
-    max-width: calc(100% - 260px); text-align: right;
+    max-width: calc(100% - 330px); text-align: right;
 }
 .viewer-credit a { color: inherit; }
 
@@ -182,7 +182,7 @@ html.viewer-expanded { overflow: hidden; }
     .viewer { aspect-ratio: 4 / 5; }
     .viewer-hint { top: 56px; right: 12px; max-width: none; font-size: 12px; text-align: center; }
     .viewer-tools button { padding: 0 9px; font-size: 12px; }
-    .viewer-credit { max-width: calc(100% - 150px); font-size: 10px; }
+    .viewer-credit { max-width: calc(100% - 175px); font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .viewer-spinner { animation-duration: 3s; }

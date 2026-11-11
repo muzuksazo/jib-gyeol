@@ -19,9 +19,9 @@
   ],
   "startYaw": 135,
   "map": {
-    "minX": -2.212,
-    "minZ": -2.389,
-    "sizeX": 9.6,
-    "sizeZ": 6.4
+    "minX": -2.062,
+    "minZ": -2.139,
+    "sizeX": 9.3,
+    "sizeZ": 6.0
   }
 }

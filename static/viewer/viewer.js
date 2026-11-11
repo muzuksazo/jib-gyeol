@@ -284,7 +284,7 @@ async function start(root) {
         minimap.hidden = false;
         mm = { me: el('me'), ghost: el('ghost') };
         const toWorld = (e) => {
-            const r = minimap.getBoundingClientRect();
+            const r = img.getBoundingClientRect();   // 테두리를 뺀 그림 영역 기준
             const x = area.minX + ((e.clientX - r.left) / r.width) * area.sizeX;
             const z = area.minZ + ((e.clientY - r.top) / r.height) * area.sizeZ;
             return nav.nearestWalkable(x, z, 3);
