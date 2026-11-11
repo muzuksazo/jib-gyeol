@@ -1,0 +1,67 @@
+/* wishlist.css — ⑤ 찜 · 비교 화면 배치만 (담당: PO). 색 · 글꼴 · 버튼은 style.css 변수를 따라요. */
+
+.wish h2 { font-size: 20px; margin: 28px 0 10px; }
+.wish h2 small { font-size: 14px; font-weight: 500; color: var(--color-text-desc); margin-left: 6px; }
+.wish-hint { color: var(--color-text-desc); font-size: 15px; margin: 4px 0 12px; }
+.wish .empty p { margin: 0 0 18px; line-height: 1.7; }
+.muted { color: var(--color-text-desc); }
+
+/* 비교 표 — 좁은 화면에선 표만 옆으로 밀어서 봐요 */
+.compare-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.compare-scroll:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+.compare { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 15px; }
+.compare th, .compare td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+}
+.compare tbody tr:last-child th, .compare tbody tr:last-child td { border-bottom: 0; }
+.compare tbody th {
+  width: 120px;
+  color: var(--color-text-label);
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--color-neutral);
+}
+.compare thead th { vertical-align: bottom; }
+
+.compare-thumb {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-sub);
+  margin-bottom: 10px;
+  color: var(--color-primary);
+}
+.compare-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.compare-thumb svg { width: 44px; height: auto; opacity: .45; }
+.compare-title { font-size: 16px; font-weight: 700; color: var(--color-text); text-decoration: none; }
+.compare-title:hover { color: var(--color-primary); }
+
+/* 더 나은 값 — 색만으로 구분하지 않고 ★ 글자도 함께 */
+.compare td.best { background: var(--color-sub); font-weight: 700; color: var(--color-primary); }
+.best-mark { display: block; font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+.btn-small { height: 40px; padding: 0 16px; font-size: 14px; }
+
+/* 비교할 매물 고르기 */
+.wish-pick { margin-top: 24px; }
+.wish-pick h2 { margin-top: 0; }
+.pick-list { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
+.pick-list label { display: flex; gap: 10px; align-items: center; cursor: pointer; margin: 0; }
+.pick-list input { width: 20px; height: 20px; accent-color: var(--color-primary); }
+
+/* 화면엔 안 보이고 화면 읽기 프로그램만 읽는 글자 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

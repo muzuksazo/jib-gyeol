@@ -1,14 +1,135 @@
 {% extends "base.html" %}
-{# ⑤ 찜 · 비교 — 담당: PO #}
-{% block title %}찜 목록{% endblock %}
+{# ⑤ 찜 · 비교 — 담당: PO. 색 · 모양은 공통 디자인(style.css)을 따르고, wishlist.css 는 비교 표 배치만 맡아요. #}
+{% block title %}찜 · 비교{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='wishlist.css') }}">{% endblock %}
+
+{# 가격 표시: 22000(만원) → 2억 2,000만 #}
+{% macro won(p) -%}
+  {%- if p is none -%}-
+  {%- elif p >= 10000 -%}{{ p // 10000 }}억{% if p % 10000 %} {{ '{:,}'.format(p % 10000) }}만{% endif %}
+  {%- else -%}{{ '{:,}'.format(p) }}만{%- endif -%}
+{%- endmacro %}
+
 {% block content %}
-<h1>찜 목록</h1>
-<ul class="cards">
-  {% for item in items %}
-  <li><a href="{{ url_for('detail.show', listing_id=item.id) }}">{{ item.title }}</a> · {{ item.region }} · {{ item.deal_type }} {{ item.price }}만</li>
+<div class="wish">
+  <div class="section-head">
+    <h1>찜 · 비교</h1>
+    {% if items %}<span class="chip chip-soft">찜 {{ items|length }}개</span>{% endif %}
+  </div>
+
+  {% if not items %}
+  {# 빈 상태 — 다음 행동을 안내 #}
+  <div class="card empty">
+    <p>아직 찜한 매물이 없어요.<br>마음에 드는 집에서 ♡ 찜하기를 누르면 여기서 나란히 비교할 수 있어요.</p>
+    <a class="btn" href="{{ url_for('listings.index') }}">매물 보러 가기</a>
+  </div>
+
   {% else %}
-  <li>아직 찜한 매물이 없어요. <a href="{{ url_for('listings.index') }}">매물 보러 가기</a></li>
-  {% endfor %}
-</ul>
-<p class="todo">TODO(PO): 찜한 매물 나란히 비교하기</p>
+  {# ── 1. 비교 표 ── #}
+  <section aria-labelledby="compare-title">
+    <h2 id="compare-title">나란히 비교하기</h2>
+
+    {% if compare|length < 2 %}
+    <p class="wish-hint">매물을 하나 더 찜하면 나란히 비교할 수 있어요.</p>
+    {% elif not same_deal %}
+    <p class="wish-hint">거래 유형(전세 · 월세 · 매매)이 섞여 있어서 가격은 강조하지 않았어요.</p>
+    {% endif %}
+
+    <div class="compare-scroll" role="region" aria-labelledby="compare-title" tabindex="0">
+      <table class="compare">
+        <caption class="sr-only">찜한 매물 비교 — 칸마다 더 나은 값에 ★ 표시</caption>
+        <thead>
+          <tr>
+            <th scope="col"><span class="sr-only">항목</span></th>
+            {% for item in compare %}
+            <th scope="col">
+              <a class="compare-thumb" href="{{ url_for('detail.show', listing_id=item.id) }}">
+                {% if item.image_url %}<img src="{{ item.image_url }}" alt="" loading="lazy">
+                {% else %}<svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>{% endif %}
+              </a>
+              <a class="compare-title" href="{{ url_for('detail.show', listing_id=item.id) }}">{{ item.title }}</a>
+            </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">지역</th>
+            {% for item in compare %}<td>{{ item.region }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">거래 유형</th>
+            {% for item in compare %}<td><span class="chip chip-soft">{{ item.deal_type }}</span></td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">보증금 · 매매가</th>
+            {% for item in compare %}
+            <td class="{% if item.id in best.price %}best{% endif %}">{{ won(item.price) }}{% if item.id in best.price %} <span class="best-mark">★ 가장 낮아요</span>{% endif %}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">월세</th>
+            {% for item in compare %}
+            <td class="{% if item.id in best.monthly_rent %}best{% endif %}">{% if item.monthly_rent %}{{ item.monthly_rent }}만{% else %}-{% endif %}{% if item.id in best.monthly_rent %} <span class="best-mark">★ 가장 낮아요</span>{% endif %}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">방</th>
+            {% for item in compare %}
+            <td class="{% if item.id in best.rooms %}best{% endif %}">{% if item.rooms %}{{ item.rooms }}개{% else %}-{% endif %}{% if item.id in best.rooms %} <span class="best-mark">★ 가장 많아요</span>{% endif %}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">면적</th>
+            {% for item in compare %}
+            <td class="{% if item.id in best.area_m2 %}best{% endif %}">{% if item.area_m2 %}{{ item.area_m2 }}㎡ <small>({{ (item.area_m2 / 3.3058)|round(1) }}평)</small>{% else %}-{% endif %}{% if item.id in best.area_m2 %} <span class="best-mark">★ 가장 넓어요</span>{% endif %}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">층</th>
+            {% for item in compare %}<td>{% if item.floor %}{{ item.floor }}층{% else %}-{% endif %}</td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">3D 둘러보기</th>
+            {% for item in compare %}
+            <td>{% if item.splat_url %}<a href="{{ url_for('detail.show', listing_id=item.id) }}">360° 3D 보기</a>{% else %}<span class="muted">준비 중</span>{% endif %}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <th scope="row"><span class="sr-only">찜 취소</span></th>
+            {% for item in compare %}
+            <td>
+              <form method="post" action="{{ url_for('wishlist.toggle', listing_id=item.id) }}">
+                <button class="btn btn-sub btn-small" aria-label="{{ item.title }} 찜 취소">♥ 찜 취소</button>
+              </form>
+            </td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {# ── 2. 비교할 매물 고르기 (찜이 비교 칸보다 많을 때만) — 보기만 바꾸니까 GET ── #}
+  {% if items|length > max_compare %}
+  <section class="card-soft wish-pick" aria-labelledby="pick-title">
+    <h2 id="pick-title">비교할 매물 고르기 <small>최대 {{ max_compare }}개</small></h2>
+    <form method="get">
+      <ul class="pick-list">
+        {% for item in items %}
+        <li>
+          <label>
+            <input type="checkbox" name="compare" value="{{ item.id }}" {% if item.id in compare_ids %}checked{% endif %}>
+            {{ item.title }} <span class="muted">· {{ item.region }} · {{ item.deal_type }}</span>
+          </label>
+        </li>
+        {% endfor %}
+      </ul>
+      <button class="btn">이 매물로 비교하기</button>
+      <p class="wish-hint">{{ max_compare }}개보다 많이 고르면 앞에서부터 {{ max_compare }}개만 비교해요.</p>
+    </form>
+  </section>
+  {% endif %}
+  {% endif %}
+</div>
 {% endblock %}
