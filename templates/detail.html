@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{# ③ 매물 상세 + 3D — 담당: 팀원 A #}
+{# ③ 매물 상세 + 3D — 담당: 여님 (데이터셋) #}
 {% block title %}{{ listing.title }}{% endblock %}
 {% block content %}
 <h1>{{ listing.title }}</h1>
@@ -9,7 +9,7 @@
 
 <section class="viewer" aria-label="3D 둘러보기">
   {% if listing.splat_url %}
-    {# TODO(팀원 A): 가우시안 스플래팅 웹 뷰어로 listing.splat_url 파일 띄우기 #}
+    {# TODO(여님): 가우시안 스플래팅 웹 뷰어로 listing.splat_url 파일 띄우기 #}
     <p>3D 파일: {{ listing.splat_url }}</p>
   {% else %}
     <p>이 매물은 아직 3D 둘러보기가 준비되지 않았어요.</p>

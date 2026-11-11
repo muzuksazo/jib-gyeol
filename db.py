@@ -95,5 +95,5 @@ def get_listing(listing_id):
         con.close()
 
 
-# TODO(여님): 필터용 함수 — 예) get_listings_filtered(region, deal_type, max_price)
+# TODO(여님 ↔ 팀원 A): ② 목록 필터용 함수 — 팀원 A가 필요한 조건을 말하면 여님이 만들어요 — 예) get_listings_filtered(region, deal_type, max_price)
 #   값은 반드시 ? 자리에. CSV를 고친 뒤엔 jibgyeol.db 파일을 지우고 다시 켜야 새 데이터가 들어가요.

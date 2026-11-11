@@ -26,8 +26,8 @@ db.init_db()   # 앱이 켜질 때 표 만들기 (Render 새 서버엔 DB 파일
 
 # 5개 페이지 등록 — 1인 1페이지
 app.register_blueprint(home_bp)        # ① 홈            — 원님
-app.register_blueprint(listings_bp)    # ② 매물 목록     — 여님
-app.register_blueprint(detail_bp)      # ③ 매물 상세+3D  — 팀원 A
+app.register_blueprint(listings_bp)    # ② 매물 목록     — 팀원 A
+app.register_blueprint(detail_bp)      # ③ 매물 상세+3D  — 여님
 app.register_blueprint(request_bp)     # ④ 의뢰서        — 팀원 B
 app.register_blueprint(wishlist_bp)    # ⑤ 찜·비교       — PO
 

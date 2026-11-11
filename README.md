@@ -9,8 +9,8 @@ D21 Flask ② 팀 프로젝트 · 5인 팀
 | 담당 | 역할 | 페이지 | 고칠 파일 |
 |---|---|---|---|
 | 원님 | 디자인 · 배포 | ① 홈 `/` | `pages/home.py` · `templates/home.html` · **공통** `base.html` `404.html` `500.html` `static/` |
-| 여님 | 데이터셋 | ② 매물 목록 `/listings` | `pages/listings.py` · `templates/listings.html` · **공통** `db.py` `data/listings.csv` |
-| 팀원 A | 개발 | ③ 매물 상세 + 3D `/listings/<번호>` | `pages/detail.py` · `templates/detail.html` |
+| 팀원 A | 개발 | ② 매물 목록 `/listings` | `pages/listings.py` · `templates/listings.html` |
+| 여님 | 데이터셋 | ③ 매물 상세 + 3D `/listings/<번호>` | `pages/detail.py` · `templates/detail.html` · **공통** `db.py` `data/listings.csv` |
 | 팀원 B | 개발 | ④ 의뢰서 `/request` | `pages/request_form.py` · `templates/request.html` |
 | PO | PO · GitHub | ⑤ 찜 · 비교 `/wishlist` | `pages/wishlist.py` · `templates/wishlist.html` · `app.py` |
 
