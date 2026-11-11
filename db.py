@@ -1,4 +1,4 @@
-# db.py — 데이터베이스 (담당: 여님)
+# db.py — 데이터베이스 (담당: 팀원 A = 매물 표 listings · 팀원 B = 의뢰서 표 requests)
 # SQLite는 DB 전체가 파일 하나(jibgyeol.db)예요. 이 파일은 깃에 올리지 않아요(.gitignore).
 # 사용자 값은 절대 문장에 이어 붙이지 말고 반드시 ? 자리에 넣어요.
 
@@ -95,5 +95,5 @@ def get_listing(listing_id):
         con.close()
 
 
-# TODO(여님 ↔ 팀원 A): ② 목록 필터용 함수 — 팀원 A가 필요한 조건을 말하면 여님이 만들어요 — 예) get_listings_filtered(region, deal_type, max_price)
+# TODO(팀원 A): ② 목록 필터용 함수 — 예) get_listings_filtered(region, deal_type, max_price)
 #   값은 반드시 ? 자리에. CSV를 고친 뒤엔 jibgyeol.db 파일을 지우고 다시 켜야 새 데이터가 들어가요.
