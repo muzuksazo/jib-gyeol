@@ -1,0 +1,130 @@
+/* request.css — ④ 의뢰서 화면 전용 (담당: 팀원 B)
+   색 · 모양은 공통 디자인(style.css 의 --color-* 변수와 .btn · .card · .card-soft · .chip)을 그대로 따라요.
+   모든 규칙이 .req 안에만 적용돼서 다른 화면은 바꾸지 않아요. */
+
+/* ── 0. 공통 변수 받아 오기 ─────────────────────────
+   공통 style.css 에 변수가 있으면 그 값을 쓰고, 아직 없으면 DESIGN.md 에 적힌 같은 값을 써요. */
+.req {
+  --c-primary: var(--color-primary, #0056FF);
+  --c-primary-dark: var(--color-primary-dark, #0046D1);
+  --c-sub: var(--color-sub, #E6F0FF);
+  --c-chip: var(--color-chip, #DAE6FE);
+  --c-surface: var(--color-surface, #F5F8FD);
+  --c-text: var(--color-text, #181B25);
+  --c-text-sub: var(--color-text-sub, #3B4150);
+  --c-text-desc: var(--color-text-desc, #646374);
+  --c-border: var(--color-border, #E8ECF5);
+  --c-white: var(--color-white, #FFFFFF);
+  --c-error: var(--color-error, #D92D20);
+  --r-sm: var(--radius-sm, 12px);
+  --r: var(--radius, 20px);
+  --r-pill: var(--radius-pill, 999px);
+  --sh: var(--shadow, 0 6px 24px rgba(24, 27, 37, 0.07));
+
+  max-width: 920px; margin: 0 auto; color: var(--c-text); word-break: keep-all;
+}
+.req *, .req *::before, .req *::after { box-sizing: border-box; }
+
+/* ── 1. 이 화면만의 배치 ───────────────────────────── */
+.req .req-lead { color: var(--c-text-sub); margin: 0 0 24px; }
+.req .req-summary {
+  margin: 0 0 20px; padding: 12px 16px; border-radius: var(--r-sm); font-weight: 600;
+  color: var(--c-error); background: color-mix(in srgb, var(--c-error) 8%, var(--c-white));
+}
+
+/* 왼쪽: 쓰는 곳 · 오른쪽: 쓰는 대로 채워지는 의뢰서 */
+.req-cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+.req-form { display: grid; gap: 20px; }
+.req-form .req-field { margin: 0; padding: 0; border: 0; min-width: 0; }
+.req-form .req-field > label, .req-form legend { display: block; margin: 0 0 6px; padding: 0; font-weight: 600; font-size: 15px; }
+.req-form small { font-size: 13px; font-weight: 400; color: var(--c-text-desc); margin-left: 6px; }
+.req-form .error { margin: 6px 0 0; }
+
+/* 예산: 칸 안에 단위, 아래에 읽는 말 */
+.req-budget { position: relative; }
+.req-budget input { padding-right: 60px; font-variant-numeric: tabular-nums; }
+.req-budget span { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--c-text-desc); font-size: 15px; pointer-events: none; }
+.req-read { margin: 6px 0 0; font-size: 14px; font-weight: 600; color: var(--c-primary); }
+.req-read:empty { display: none; }
+
+/* 방 수: 한 번 눌러 고르는 알약 버튼 (고르기 전 = .btn-sub 색, 고른 뒤 = .btn 색) */
+.req-rooms { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.req-rooms label { position: relative; display: block; margin: 0; cursor: pointer; }
+.req-rooms input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.req-rooms span {
+  display: grid; place-items: center; min-height: 48px; font-weight: 600; font-size: 15px;
+  color: var(--c-primary); background: var(--c-sub); border-radius: var(--r-pill);
+}
+.req-rooms label:hover span { background: var(--c-chip); }
+.req-rooms input:checked + span { background: var(--c-primary); color: var(--c-white); }
+.req-rooms input:focus-visible + span { outline: 3px solid var(--c-primary); outline-offset: 2px; }
+
+/* 틀린 칸 */
+.req-form .bad input:not([type="radio"]), .req-form .bad textarea { border-color: var(--c-error); }
+.req-form .bad .req-rooms span { box-shadow: inset 0 0 0 1px var(--c-error); }
+.req-form .bad .req-rooms input:checked + span { box-shadow: none; }
+
+.req-form button { width: 100%; min-height: 52px; margin-top: 4px; }
+
+/* 채워지는 의뢰서 (.card-soft) */
+.req-slip { position: sticky; top: 88px; }
+.req-slip h2 { font-size: 18px; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--c-border); }
+.req-slip dl { display: grid; gap: 14px; margin: 0; }
+.req-slip dt { font-size: 13px; color: var(--c-text-desc); margin: 0 0 2px; }
+.req-slip dd { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35; overflow-wrap: anywhere; }
+.req-slip dd:empty::before { content: ""; display: block; width: 64px; height: 10px; margin: 8px 0 7px; border-radius: 5px; background: var(--c-chip); }
+.req-slip .req-slip-note dd { font-size: 15px; font-weight: 400; letter-spacing: 0; line-height: 1.6; white-space: pre-wrap; }
+.req-slip .req-slip-note dd:empty::before { width: 100%; }
+
+/* 최근 의뢰서 (.cards > .card) */
+.req .req-recent { margin: 56px 0 16px; }
+.req-list p { margin: 0; }
+.req-who { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.req-who strong { font-size: 17px; overflow-wrap: anywhere; }
+.req-who .when { flex: none; color: var(--c-text-desc); font-size: 13px; }
+.req-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 !important; }
+.req-text { color: var(--c-text-sub); font-size: 15px; overflow-wrap: anywhere; }
+.req .req-empty { color: var(--c-text-desc); }
+
+@media (max-width: 760px) {
+  .req-cols { grid-template-columns: minmax(0, 1fr); }
+  .req-slip { position: static; }
+}
+
+/* ── 2. 공통 스타일 보강 ────────────────────────────
+   공통 style.css (원님 · design/brand-identity) 의 제목 · 입력칸 · 버튼 · 카드 · 칩과 '같은 값'이에요.
+   그 스타일이 main 에 들어오기 전에도 같은 모양으로 보이게 하려고 넣었어요.
+   공통 스타일이 main 에 들어온 뒤에는 이 2번 구역을 통째로 지워도 모양이 그대로예요. */
+.req h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; margin: 0 0 12px; }
+.req h2 { font-weight: 700; line-height: 1.3; letter-spacing: -0.02em; }
+.req h2.req-recent { font-size: clamp(22px, 3vw, 28px); }
+
+.req-form input:not([type="radio"]), .req-form textarea {
+  display: block; width: 100%; min-height: 48px; margin: 0; padding: 12px 16px;
+  font: inherit; color: var(--c-text); background: var(--c-white);
+  border: 1px solid var(--c-border); border-radius: var(--r-sm);
+}
+.req-form textarea { min-height: 120px; resize: vertical; }
+.req-form ::placeholder { color: var(--c-text-desc); }
+.req-form input:not([type="radio"]):focus, .req-form textarea:focus {
+  outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 4px var(--c-sub);
+}
+.req .error { color: var(--c-error); font-size: 14px; }
+
+.req-form button {
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 24px;
+  font: inherit; font-weight: 600; font-size: 16px;
+  border: 0; border-radius: var(--r-pill); cursor: pointer;
+  background: var(--c-primary); color: var(--c-white);
+}
+.req-form button:hover { background: var(--c-primary-dark); }
+.req-form button:focus-visible { outline: 3px solid var(--c-primary); outline-offset: 2px; }
+
+.req .card { background: var(--c-white); border-radius: var(--r); padding: 20px; box-shadow: var(--sh); }
+.req .card-soft { background: var(--c-surface); border-radius: var(--r); padding: 24px; }
+.req .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.req .chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px;
+  background: var(--c-surface); color: var(--c-text);
+  border-radius: var(--r-pill); font-size: 14px; font-weight: 600; overflow-wrap: anywhere;
+}

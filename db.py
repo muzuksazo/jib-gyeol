@@ -44,12 +44,13 @@ def init_db():
         con.execute("""
             CREATE TABLE IF NOT EXISTS requests (   -- ④ 의뢰서 (팀원 B가 칸을 바꿔도 돼요)
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
-                nickname   TEXT NOT NULL,
-                region     TEXT NOT NULL,
-                budget     INTEGER NOT NULL,
-                rooms      INTEGER NOT NULL,
-                message    TEXT NOT NULL,
-                created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                -- CHECK = DB가 한 번 더 막는 규칙. 서버 검증(validate.py)을 건너뛴 값이 와도 저장되지 않아요.
+                nickname   TEXT NOT NULL    CHECK (length(nickname) BETWEEN 1 AND 20),
+                region     TEXT NOT NULL    CHECK (length(region) BETWEEN 1 AND 20),
+                budget     INTEGER NOT NULL CHECK (typeof(budget) = 'integer' AND budget BETWEEN 1 AND 1000000),  -- 만원
+                rooms      INTEGER NOT NULL CHECK (typeof(rooms) = 'integer' AND rooms BETWEEN 1 AND 5),
+                message    TEXT NOT NULL    CHECK (length(message) BETWEEN 1 AND 200),
+                created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
             )
         """)
         empty = con.execute("SELECT COUNT(*) FROM listings").fetchone()[0] == 0

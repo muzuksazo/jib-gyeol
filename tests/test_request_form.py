@@ -93,6 +93,37 @@ def test_missing_field_is_400_not_500(client):
     assert len(saved()) == 0
 
 
+@pytest.mark.parametrize(
+    "row",
+    [
+        ("", "마포구", 20000, 2, "내용"),            # 닉네임 빈칸
+        ("가" * 21, "마포구", 20000, 2, "내용"),     # 닉네임 길이 초과
+        ("닉", "", 20000, 2, "내용"),                # 지역 빈칸
+        ("닉", "마포구", 0, 2, "내용"),              # 예산 0
+        ("닉", "마포구", "이억", 2, "내용"),         # 예산에 글자 (SQLite는 원래 그냥 받아 줘요)
+        ("닉", "마포구", 20000, 6, "내용"),          # 방 수 범위 밖
+        ("닉", "마포구", 20000, "둘", "내용"),       # 방 수에 글자
+        ("닉", "마포구", 20000, 2, ""),              # 요청 빈칸
+        ("닉", "마포구", 20000, 2, "가" * 201),      # 요청 길이 초과
+        (None, "마포구", 20000, 2, "내용"),          # NOT NULL
+    ],
+)
+def test_db_itself_refuses_bad_rows(client, row):
+    """서버 검증을 건너뛰고 DB에 바로 넣어도 CHECK 규칙이 막아요."""
+    import sqlite3
+
+    con = db.get_db()
+    try:
+        with pytest.raises(sqlite3.IntegrityError):
+            con.execute(
+                "INSERT INTO requests (nickname, region, budget, rooms, message) VALUES (?, ?, ?, ?, ?)",
+                row,
+            )
+    finally:
+        con.close()
+    assert len(saved()) == 0
+
+
 def test_quotes_and_script_are_stored_as_plain_text(client):
     attack = "It's ok'); DROP TABLE requests; -- <script>alert(1)</script>"
     res = client.post("/request", data={**GOOD, "message": attack})

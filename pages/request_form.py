@@ -37,14 +37,39 @@ def save_request(values):
         con.close()
 
 
-def recent_requests(limit=5):
+def won_text(value):
+    """만원 단위 숫자를 읽는 말로: 20000 → '2억원', 25000 → '2억 5,000만원'. 숫자가 아니면 빈 글자."""
+    text = str(value if value is not None else "").strip()
+    if not (text.isascii() and text.isdigit()) or len(text) > 7 or int(text) < 1:
+        return ""
+    eok, rest = divmod(int(text), 10000)
+    parts = []
+    if eok:
+        parts.append(f"{eok}억")
+    if rest:
+        parts.append(f"{rest:,}만")
+    return " ".join(parts) + "원"
+
+
+def recent_requests(limit=6):
     con = db.get_db()
     try:
-        return con.execute(
+        rows = con.execute(
             "SELECT * FROM requests ORDER BY id DESC LIMIT ?", (limit,)
         ).fetchall()
     finally:
         con.close()
+    return [{**dict(row), "budget_text": won_text(row["budget"])} for row in rows]
+
+
+def show_form(values, errors):
+    return render_template(
+        "request.html",
+        values=values,
+        errors=errors,
+        budget_text=won_text(values.get("budget")),
+        recent=recent_requests(),
+    )
 
 
 @bp.route("/request", methods=["GET", "POST"])
@@ -53,12 +78,10 @@ def form():
         values, errors = validate_request(request.form)
         if errors:
             # 실패하면 redirect 하지 않아요. 쓴 값을 그대로 둔 채 400 으로 같은 화면을 다시 보여 줘요.
-            return render_template(
-                "request.html", values=values, errors=errors, recent=recent_requests()
-            ), 400
+            return show_form(values, errors), 400
 
         save_request(values)
         flash("의뢰서가 접수됐어요")
         return redirect(url_for("request_form.form"))   # PRG — 새로고침해도 두 번 저장되지 않아요
 
-    return render_template("request.html", values={}, errors={}, recent=recent_requests())
+    return show_form({}, {})
