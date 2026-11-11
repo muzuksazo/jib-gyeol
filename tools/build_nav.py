@@ -21,6 +21,12 @@ BODY = 0.18          # 사람 반경 — 벽·가구에서 이만큼 떨어진 �
 OBST_LOW, OBST_HIGH = 0.25, 1.7   # 바닥에서 이 높이 사이에 뭔가 있으면 장애물 (m)
 EYE = 1.5            # 눈높이 (m)
 
+# 평면도 색 — DESIGN.md / static/style.css 의 색과 같은 값 (그림 파일이라 CSS 변수를 못 써서 여기 적어요)
+PLAN_WALL = (24, 27, 37, 255)              # --color-text  #181B25
+PLAN_BLOCK = (218, 230, 254, 255)          # --color-chip  #DAE6FE (두꺼운 벽체 · 붙박이)
+PLAN_FURNITURE = (230, 240, 255, 255)      # --color-sub   #E6F0FF
+PLAN_FURNITURE_LINE = (179, 206, 253, 255) # --sky-bottom  #B3CEFD
+
 
 def read_ply(path):
     f = open(path, 'rb')
@@ -248,11 +254,11 @@ def main(ply, out_dir):
             continue
         x_a, x_b = (fx.min() - cx0) * UP + 2, (fx.max() + 1 - cx0) * UP - 3
         z_a, z_b = (fz.min() - cz0) * UP + 2, (fz.max() + 1 - cz0) * UP - 3
-        draw.rounded_rectangle([x_a, z_a, x_b, z_b], radius=5, fill=(230, 240, 255, 255), outline=(150, 178, 232, 255), width=2)
+        draw.rounded_rectangle([x_a, z_a, x_b, z_b], radius=5, fill=PLAN_FURNITURE, outline=PLAN_FURNITURE_LINE, width=2)
     canvas = np.asarray(img).copy()
-    canvas[block_px & ~door] = (205, 214, 232, 255)
+    canvas[block_px & ~door] = PLAN_BLOCK
     canvas[~floor_px] = (0, 0, 0, 0)
-    canvas[wall_px] = (31, 42, 68, 255)                      # 벽은 가구 위에 덮어 그린다
+    canvas[wall_px] = PLAN_WALL                              # 벽은 가구 위에 덮어 그린다
     Image.fromarray(canvas, 'RGBA').save(f'{out_dir}/map.png', optimize=True)
     map_area = {'minX': round(float(x0 + cx0 * CELL), 3), 'minZ': round(float(z0 + cz0 * CELL), 3),
                 'sizeX': round(float((cx1 - cx0) * CELL), 3), 'sizeZ': round(float((cz1 - cz0) * CELL), 3)}

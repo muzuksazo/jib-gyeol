@@ -297,12 +297,14 @@ async function start(root) {
         mm.place = place;
         // 방 이름: 장면 폴더의 rooms.json([{ name, x, z }])이 있으면 미니맵에 적는다 (사람이 적는 파일)
         fetch(`${baseUrl}rooms.json`).then((r) => (r.ok ? r.json() : [])).then((rooms) => {
+            const plan = document.querySelector('[data-plan]');   // 평면도 탭의 큰 그림에도 같은 이름을 적는다
             for (const room of rooms) {
                 const label = document.createElement('span');
                 label.className = 'mm-room';
                 label.textContent = room.name;
                 place(label, room.x, room.z);
                 minimap.insertBefore(label, mm.ghost);
+                if (plan) plan.append(label.cloneNode(true));
             }
         }).catch(() => {});
 
