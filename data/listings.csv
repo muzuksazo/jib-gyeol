@@ -1,3 +1,13 @@
 id,title,region,deal_type,price,monthly_rent,rooms,area_m2,floor,description,image_url,splat_url
-1,(샘플) 햇살 드는 망원동 투룸,마포구,전세,22000,,2,39.6,3,뼈대 확인용 샘플이에요. 여님이 진짜 데이터로 바꿔 주세요.,,/static/splats/modlinek-villa/lod-meta.json
-2,(샘플) 역세권 성수동 원룸,성동구,월세,1000,65,1,23.1,5,뼈대 확인용 샘플이에요. 여님이 진짜 데이터로 바꿔 주세요.,,
+1,햇살 드는 망원동 투룸,마포구,전세,22000,,2,39.6,3,남향 거실에 오후 내내 볕이 들어요. 망원시장 도보 5분.,/static/listings/1.png,/static/splats/modlinek-villa/lod-meta.json
+2,역세권 성수동 원룸,성동구,월세,1000,65,1,23.1,5,성수역 도보 3분. 풀옵션(세탁기·냉장고·에어컨).,https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&fit=crop,
+3,합정역 앞 신축 오피스텔,마포구,월세,1000,80,1,26.4,12,2024년 준공 신축. 높은 층이라 한강이 살짝 보여요.,https://images.unsplash.com/photo-1757524503555-b62633f47670?w=800&q=80&fit=crop,
+4,연남동 조용한 골목 쓰리룸,마포구,매매,68000,,3,72.7,2,경의선숲길 바로 옆. 아이 키우기 좋은 조용한 동네.,https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80&fit=crop,
+5,서울숲 근처 투룸 빌라,성동구,전세,30000,,2,46.2,4,서울숲 도보 7분. 리모델링해서 주방이 넓어요.,https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80&fit=crop,
+6,왕십리역 가성비 원룸,성동구,월세,500,50,1,19.8,3,환승역 4개 노선. 첫 자취방으로 추천해요.,https://images.unsplash.com/photo-1773578978637-c9771e7a9913?w=800&q=80&fit=crop,
+7,강남역 직장인 원룸,강남구,월세,2000,95,1,24.8,8,강남역 도보 6분. 관리비에 인터넷 포함.,https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80&fit=crop,
+8,대치동 학군지 아파트,강남구,매매,195000,,3,84.9,10,대치 학원가 도보권. 단지 안에 놀이터와 헬스장.,https://images.unsplash.com/photo-1564078516393-cf04bd966897?w=800&q=80&fit=crop,
+9,신림동 대학가 투룸,관악구,전세,15000,,2,36.3,2,서울대입구역 버스 10분. 룸메이트와 살기 좋아요.,https://images.unsplash.com/photo-1759691555393-60cd5355d840?w=800&q=80&fit=crop,
+10,봉천동 햇살 원룸,관악구,월세,300,40,1,18.2,4,부담 없는 보증금. 창이 커서 환기가 잘 돼요.,https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80&fit=crop,
+11,샤로수길 복층 원룸,관악구,월세,1000,60,1,29.7,5,복층 구조라 침실과 거실이 나뉘어요. 맛집 골목 바로 앞.,https://images.unsplash.com/photo-1628592102751-ba83b0314276?w=800&q=80&fit=crop,
+12,압구정 한강뷰 전세,강남구,전세,85000,,3,99.2,15,한강이 정면으로 보이는 고층. 주차 2대 가능.,https://images.unsplash.com/photo-1763827513396-5917fc6c84f3?w=800&q=80&fit=crop,
