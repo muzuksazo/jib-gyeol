@@ -209,6 +209,18 @@ def main(ply, out_dir):
     inner = grow(core, 6) & inner                            # 그 몸통에서 외벽까지 이어지는 부분만 되살린다 (톱니 제거)
     chunky = reaching_in(chunky)
 
+    # 외벽에 붙은 작은 덩어리(커튼·조명·벽 두께 차이)는 평면도에서 뺀다:
+    # 방 안쪽으로 60cm 넘게 들어오지 않고, 길이도 1m 이하인 것
+    edge_band = foot & ~shrink(foot, 3)
+    far_in = shrink(foot, 12)
+    lab, cnt = components(inner | chunky)
+    for k in range(1, len(cnt)):
+        part = lab == k
+        pz, px_ = np.nonzero(part)
+        if (part & edge_band).any() and not (part & far_in).any() and max(pz.max() - pz.min(), px_.max() - px_.min()) + 1 <= 20:
+            inner &= ~part
+            chunky &= ~part
+
     zs, xs = np.nonzero(foot)
     m = 4                                                    # 여백(칸)
     cz0, cz1 = max(0, zs.min() - m), min(d, zs.max() + m + 1)
