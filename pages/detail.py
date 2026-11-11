@@ -28,4 +28,7 @@ def show(listing_id):
     listing = db.get_listing(listing_id)
     if listing is None:        # 없는 매물 번호 (예: /listings/999)
         abort(404)             # → "없어요" 404 화면 (화면 디자인은 원님의 404.html)
-    return render_template("detail.html", listing=listing, price_text=price_text(listing))
+    # 평면도 그림(map.png)은 3D 파일(lod-meta.json)과 같은 폴더에 있어요 (tools/build_nav.py가 만들어요)
+    splat_url = listing["splat_url"] or ""
+    plan_url = splat_url.rsplit("/", 1)[0] + "/map.png" if "/" in splat_url else None
+    return render_template("detail.html", listing=listing, price_text=price_text(listing), plan_url=plan_url)
