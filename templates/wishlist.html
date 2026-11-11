@@ -26,7 +26,7 @@
   <div class="card empty-state">
     <svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
     <p class="empty-title">아직 찜한 매물이 없어요.</p>
-    <p class="empty-desc">마음에 드는 집에서 ♡ 찜하기를 누르면 여기서 나란히 비교할 수 있어요.</p>
+    <p class="empty-desc">마음에 드는 집의 하트를 누르면 여기서 나란히 비교할 수 있어요.</p>
     <a class="btn" href="{{ url_for('listings.index') }}">매물 보러 가기</a>
   </div>
 
@@ -110,7 +110,7 @@
           <tr>
             <th scope="row">3D 둘러보기</th>
             {% for item in compare %}
-            <td>{% if item.splat_url %}<a class="compare-3d" href="{{ url_for('detail.show', listing_id=item.id) }}">360° 3D 보기 <span aria-hidden="true">→</span></a>{% else %}<span class="muted">준비 중</span>{% endif %}</td>
+            <td>{% if item.splat_url %}<a class="compare-3d" href="{{ url_for('detail.show', listing_id=item.id) }}">360° 3D 보기 <span aria-hidden="true">→</span></a>{% else %}<span class="muted">준비 중이에요</span>{% endif %}</td>
             {% endfor %}
           </tr>
         </tbody>

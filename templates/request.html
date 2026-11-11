@@ -9,7 +9,7 @@
 {% block content %}
 <div class="req">
   <h1>의뢰서 남기기</h1>
-  <p class="req-lead">원하는 조건을 남겨 주세요. 실명과 연락처는 받지 않아요.</p>
+  <p class="req-lead">원하는 조건을 남겨 주시면 맞는 집을 찾아 드려요. 실명과 연락처는 받지 않아요.</p>
 
   {% if errors %}
   <p class="error req-summary" role="alert">{{ errors|length }}곳을 다시 확인해 주세요. 쓴 내용은 그대로 있어요.</p>
@@ -20,7 +20,7 @@
     <form class="card req-form" method="post" action="{{ url_for('request_form.form') }}">
       {# 묶음 1: 나 #}
       <section class="req-group" aria-labelledby="req-g1">
-        <h2 class="req-group-title" id="req-g1"><span class="req-step" aria-hidden="true">1</span>나를 부를 이름</h2>
+        <h2 class="req-group-title" id="req-g1"><span class="req-step" aria-hidden="true">1</span>어떻게 불러 드릴까요?</h2>
       <div class="req-field {% if errors.nickname %}bad{% endif %}">
         <label for="req-nickname">닉네임 <small>1~20자</small></label>
         <input id="req-nickname" name="nickname" value="{{ values.nickname or '' }}" required maxlength="20"
@@ -31,7 +31,7 @@
 
       {# 묶음 2: 원하는 집 #}
       <section class="req-group" aria-labelledby="req-g2">
-        <h2 class="req-group-title" id="req-g2"><span class="req-step" aria-hidden="true">2</span>원하는 집</h2>
+        <h2 class="req-group-title" id="req-g2"><span class="req-step" aria-hidden="true">2</span>어떤 집을 찾으세요?</h2>
       <div class="req-field {% if errors.region %}bad{% endif %}">
         <label for="req-region">희망 지역 <small>예: 마포구</small></label>
         <input id="req-region" name="region" value="{{ values.region or '' }}" required maxlength="20"
@@ -40,7 +40,7 @@
       </div>
 
       <div class="req-field {% if errors.budget %}bad{% endif %}">
-        <label for="req-budget">예산 <small>만원 단위, 숫자만</small></label>
+        <label for="req-budget">예산 <small>만원 단위 숫자로</small></label>
         <div class="req-budget">
           <input id="req-budget" name="budget" value="{{ values.budget or '' }}" required inputmode="numeric"
                  placeholder="예: 20000" {% if errors.budget %}aria-invalid="true" aria-describedby="err-budget"{% endif %}>
@@ -66,7 +66,7 @@
 
       {# 묶음 3: 바라는 점 #}
       <section class="req-group" aria-labelledby="req-g3">
-        <h2 class="req-group-title" id="req-g3"><span class="req-step" aria-hidden="true">3</span>바라는 점</h2>
+        <h2 class="req-group-title" id="req-g3"><span class="req-step" aria-hidden="true">3</span>더 바라는 점이 있나요?</h2>
       <div class="req-field {% if errors.message %}bad{% endif %}">
         <label for="req-message">요청 내용 <small data-count="message">1~200자</small></label>
         <textarea id="req-message" name="message" rows="4" required maxlength="200"
