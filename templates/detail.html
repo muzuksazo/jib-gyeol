@@ -55,8 +55,8 @@
   </section>
   {% elif listing.image_url %}
   {# 3D 스캔이 없는 매물 — 매물 사진으로 둘러보기 (static/viewer/photo.js). 3D 스캔이 아니라고 화면에 적어요. #}
-  <section class="viewer viewer-photo" aria-label="사진으로 둘러보기" data-photo="{{ listing.image_url }}">
-    <div class="pv-stage" data-el="stage" tabindex="0" role="img" aria-label="{{ listing.title }} 사진. 드래그하거나 방향키로 둘러봐요.">
+  <section class="viewer viewer-photo" aria-label="사진으로 둘러보기" data-photo="{{ listing.image_url }}" data-depth="{{ url_for('static', filename='listings/depth/%d.jpg' % listing.id) }}">
+    <div class="pv-stage" data-el="stage" tabindex="0" role="img" aria-label="{{ listing.title }} 사진. 드래그하거나 방향키로 둘러보고, 더하기 · 빼기 키로 확대해요.">
       <div class="pv-world" data-el="world"></div>
     </div>
 
@@ -65,7 +65,7 @@
       <p>집 안을 불러오는 중이에요…</p>
     </div>
 
-    <p class="viewer-hint" data-el="hint"><b>드래그</b>해서 집 안을 둘러보세요</p>
+    <p class="viewer-hint" data-el="hint"><b>드래그</b>해서 둘러보고, <b>두 번 눌러</b> 확대해요</p>
 
     <div class="viewer-tools">
       <button type="button" class="btn btn-white" data-el="reset">처음 위치</button>
@@ -73,7 +73,7 @@
       <button type="button" class="btn btn-white" data-el="expand" aria-pressed="false">크게 보기</button>
     </div>
 
-    <p class="viewer-note"><b>사진 둘러보기</b> 매물 사진으로 보여 드려요. 3D 스캔은 준비 중이에요.</p>
+    <p class="viewer-note"><b>사진 둘러보기</b> 매물 사진에 깊이감을 입혀 보여 드려요. 3D 스캔은 준비 중이에요.</p>
   </section>
   {% else %}
   <section class="viewer-empty card-soft" aria-label="3D 둘러보기">

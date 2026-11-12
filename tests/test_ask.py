@@ -199,6 +199,18 @@ def test_3D_스캔이_없는_매물은_사진_둘러보기(client):
     assert "준비되지 않았어요" not in body and "viewer/viewer.js" not in body
 
 
+def test_사진_둘러보기_매물마다_깊이_지도가_있다(client):
+    import csv
+    from pathlib import Path
+    base = Path(__file__).parent.parent
+    with open(base / "data" / "listings.csv", encoding="utf-8", newline="") as f:
+        photo_only = [r["id"] for r in csv.DictReader(f) if r["image_url"] and not r["splat_url"]]
+    assert photo_only
+    for listing_id in photo_only:
+        assert (base / "static" / "listings" / "depth" / f"{listing_id}.jpg").exists(), f"{listing_id}번 깊이 지도가 없어요 — python tools/make_depth.py"
+    assert 'data-depth="/static/listings/depth/2.jpg"' in text(client.get("/listings/2"))
+
+
 def test_3D_스캔이_있는_매물은_그대로(client):
     body = text(client.get("/listings/1"))
     assert "data-splat-url=" in body and "viewer/viewer.js" in body

@@ -88,12 +88,14 @@
 .viewer-empty .logo-mark { height: 44px; color: var(--color-primary); opacity: .35; }
 .viewer-empty p { margin: 0; }
 
-/* 사진으로 둘러보기 (3D 스캔이 없는 매물 · photo.js) — 사진을 둥근 벽에 붙여 가운데에서 본다 */
+/* 사진으로 둘러보기 (3D 스캔이 없는 매물 · photo.js) — 사진을 둥근 벽에 붙여 가운데에서 본다
+   WebGL 캔버스에 그리고(깊이 지도로 입체감), WebGL 이 안 되면 .pv-world 의 세로 조각(CSS 3D)으로 그린다 */
 .pv-stage { position: absolute; inset: 0; overflow: hidden; touch-action: none; cursor: grab; background: var(--color-neutral); }
 .viewer.is-dragging .pv-stage { cursor: grabbing; }
 .pv-stage:focus-visible { outline-offset: -3px; border-radius: var(--radius-lg); }
 .pv-world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
 .pv-strip { position: absolute; left: 0; top: 0; background-repeat: no-repeat; backface-visibility: hidden; }
+.pv-stage canvas { pointer-events: none; }      /* 그림만 그린다 — 드래그 · 확대는 .pv-stage 가 받는다 */
 
 /* 3D 스캔이 아니라는 안내 */
 .viewer-note {
