@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{# ④ 의뢰서 — 담당: 팀원 B. 틀렸을 때 errors.칸이름 으로 문구, values.칸이름 으로 입력값 남기기 #}
+{# ④ 의뢰서 — 담당: 팀원 B. 틀렸을 때 errors.칸이름 으로 문구, values.칸이름 으로 입력값 남기기
+   디자인: 원님 (기능 동결 뒤 마무리) — name · id · 검증 · data-slip/read/count 는 그대로, 묶음 배치만 바꿈 #}
 {% block title %}의뢰서 남기기{% endblock %}
 {% block head %}
 {# 색 · 모양은 공통 디자인(style.css 변수와 .btn · .card · .card-soft · .chip)을 따라요. request.css 는 이 화면의 배치만 맡아요. #}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='request.css') }}">
 {% endblock %}
 {% block content %}
 <div class="req">
   <h1>의뢰서 남기기</h1>
-  <p class="req-lead">원하는 조건을 남겨 주세요. 실명과 연락처는 받지 않아요.</p>
+  <p class="req-lead">원하는 조건을 남겨 주시면 맞는 집을 찾아 드려요. 실명과 연락처는 받지 않아요.</p>
 
   {% if errors %}
   <p class="error req-summary" role="alert">{{ errors|length }}곳을 다시 확인해 주세요. 쓴 내용은 그대로 있어요.</p>
@@ -17,14 +17,21 @@
 
   <div class="req-cols">
     {# 브라우저 검사(required · maxlength)는 안내판일 뿐 — 진짜 검사는 서버(validate.py)에서 #}
-    <form class="req-form" method="post" action="{{ url_for('request_form.form') }}">
+    <form class="card req-form" method="post" action="{{ url_for('request_form.form') }}">
+      {# 묶음 1: 나 #}
+      <section class="req-group" aria-labelledby="req-g1">
+        <h2 class="req-group-title" id="req-g1"><span class="req-step" aria-hidden="true">1</span>어떻게 불러 드릴까요?</h2>
       <div class="req-field {% if errors.nickname %}bad{% endif %}">
         <label for="req-nickname">닉네임 <small>1~20자</small></label>
         <input id="req-nickname" name="nickname" value="{{ values.nickname or '' }}" required maxlength="20"
                autocomplete="off" {% if errors.nickname %}aria-invalid="true" aria-describedby="err-nickname"{% endif %}>
         {% if errors.nickname %}<p class="error" id="err-nickname">{{ errors.nickname }}</p>{% endif %}
       </div>
+      </section>
 
+      {# 묶음 2: 원하는 집 #}
+      <section class="req-group" aria-labelledby="req-g2">
+        <h2 class="req-group-title" id="req-g2"><span class="req-step" aria-hidden="true">2</span>어떤 집을 찾으세요?</h2>
       <div class="req-field {% if errors.region %}bad{% endif %}">
         <label for="req-region">희망 지역 <small>예: 마포구</small></label>
         <input id="req-region" name="region" value="{{ values.region or '' }}" required maxlength="20"
@@ -33,7 +40,7 @@
       </div>
 
       <div class="req-field {% if errors.budget %}bad{% endif %}">
-        <label for="req-budget">예산 <small>만원 단위, 숫자만</small></label>
+        <label for="req-budget">예산 <small>만원 단위 숫자로</small></label>
         <div class="req-budget">
           <input id="req-budget" name="budget" value="{{ values.budget or '' }}" required inputmode="numeric"
                  placeholder="예: 20000" {% if errors.budget %}aria-invalid="true" aria-describedby="err-budget"{% endif %}>
@@ -55,7 +62,11 @@
         </div>
         {% if errors.rooms %}<p class="error" id="err-rooms">{{ errors.rooms }}</p>{% endif %}
       </fieldset>
+      </section>
 
+      {# 묶음 3: 바라는 점 #}
+      <section class="req-group" aria-labelledby="req-g3">
+        <h2 class="req-group-title" id="req-g3"><span class="req-step" aria-hidden="true">3</span>더 바라는 점이 있나요?</h2>
       <div class="req-field {% if errors.message %}bad{% endif %}">
         <label for="req-message">요청 내용 <small data-count="message">1~200자</small></label>
         <textarea id="req-message" name="message" rows="4" required maxlength="200"
@@ -63,6 +74,7 @@
                   {% if errors.message %}aria-invalid="true" aria-describedby="err-message"{% endif %}>{{ values.message or '' }}</textarea>
         {% if errors.message %}<p class="error" id="err-message">{{ errors.message }}</p>{% endif %}
       </div>
+      </section>
 
       <button class="btn">의뢰서 보내기</button>
     </form>
@@ -70,6 +82,7 @@
     {# 쓰는 동안 옆에서 채워지는 의뢰서. 스크립트가 꺼져 있어도 서버가 받은 값으로 채워져요. #}
     <aside class="card-soft req-slip" aria-label="지금까지 쓴 의뢰서">
       <h2>내 의뢰서</h2>
+      <p class="req-slip-hint">쓰는 대로 채워져요</p>
       <dl>
         <div><dt>닉네임</dt><dd data-slip="nickname">{{ values.nickname or '' }}</dd></div>
         <div><dt>희망 지역</dt><dd data-slip="region">{{ values.region or '' }}</dd></div>
@@ -80,7 +93,10 @@
     </aside>
   </div>
 
-  <h2 class="req-recent">최근 의뢰서</h2>
+  <div class="req-recent-head">
+    <h2 class="req-recent">최근 의뢰서</h2>
+    {% if recent %}<span class="req-recent-count">최근 {{ recent|length }}건</span>{% endif %}
+  </div>
   {% if recent %}
   <ul class="cards req-list">
     {% for r in recent %}
@@ -92,7 +108,11 @@
     {% endfor %}
   </ul>
   {% else %}
-  <p class="todo req-empty">아직 의뢰서가 없어요. 첫 번째 의뢰서를 남겨 보세요.</p>
+  <div class="card empty-state">
+    <svg viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
+    <p class="empty-title">아직 의뢰서가 없어요.</p>
+    <p class="empty-desc">첫 번째 의뢰서를 남겨 보세요.</p>
+  </div>
   {% endif %}
 </div>
 
