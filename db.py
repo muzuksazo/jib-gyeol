@@ -3,11 +3,15 @@
 # 사용자 값은 절대 문장에 이어 붙이지 말고 반드시 ? 자리에 넣어요.
 
 import csv
+import os
 import sqlite3
+import tempfile
 from pathlib import Path
 
 BASE = Path(__file__).parent
-DB_PATH = BASE / "jibgyeol.db"
+# Vercel 서버는 프로젝트 폴더에 파일을 쓸 수 없어서(읽기 전용) 임시 폴더에 DB를 만들어요.
+# 임시 폴더는 서버가 새로 뜰 때마다 비워져서, 매물은 CSV로 다시 채워지고 의뢰서는 초기화돼요.
+DB_PATH = (Path(tempfile.gettempdir()) if os.environ.get("VERCEL") else BASE) / "jibgyeol.db"
 CSV_PATH = BASE / "data" / "listings.csv"
 
 INT_COLS = ("id", "price", "monthly_rent", "rooms", "floor")
