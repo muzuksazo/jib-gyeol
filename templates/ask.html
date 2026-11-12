@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{# ⑥ 물어보기 — D22 RAG. 색 · 모양은 공통 디자인(style.css)을 따르고, ask.css 는 이 화면의 배치만 맡아요.
+   상태 4가지: 처음(빈 화면) · 찾는 중 · 답 + 출처 카드 · 찾지 못했어요 (+ 오류 안내) #}
+{% block title %}물어보기 · 집결{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='ask.css') }}">{% endblock %}
+
+{% block content %}
+<div class="ask">
+  <p class="label">집결 안내 도우미</p>
+  <h1>물어보기</h1>
+  <p class="ask-lead">집결 안내 문서와 매물 목록에서 먼저 찾고, 찾은 내용만으로 답해요. 문서에 없으면 모른다고 말해요.</p>
+
+  <form class="card ask-form" method="post" action="{{ url_for('ask.index') }}" data-ask-form>
+    <label for="ask-question">질문</label>
+    <textarea id="ask-question" name="question" rows="3" required maxlength="{{ max_len }}"
+              placeholder="예: 마포구에 전세 매물 있어요?"
+              {% if notice %}aria-invalid="true" aria-describedby="ask-notice"{% endif %}>{{ question }}</textarea>
+    {% if notice %}<p class="error" id="ask-notice">{{ notice }}</p>{% endif %}
+    <div class="ask-row">
+      <span class="ask-count"><span data-ask-count>{{ question|length }}</span> / {{ max_len }}자</span>
+      <button class="btn" data-ask-go>물어보기</button>
+    </div>
+    <div class="ask-examples">
+      <p>이런 걸 물어볼 수 있어요</p>
+      {% for ex in examples %}<button type="button" class="btn btn-sub" data-ask-example>{{ ex }}</button>{% endfor %}
+    </div>
+  </form>
+
+  {% if error %}<p class="error ask-error" role="alert">{{ error }}</p>{% endif %}
+
+  <div class="ask-loading" data-ask-loading role="status" hidden>
+    <span class="ask-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    문서에서 찾는 중이에요…
+  </div>
+
+  <div data-ask-result>
+  {% if result %}
+    <p class="ask-asked">질문 · <strong>{{ question }}</strong></p>
+
+    {% if result.not_found %}
+    <section class="card-soft ask-answer ask-none" aria-label="답">
+      <h2>{{ result.answer }}</h2>
+      <p>이 내용은 집결 안내 문서에 없어요. 아래 조각은 가장 가까웠던 것일 뿐, 답이 들어 있지 않아요.</p>
+      <div class="ask-next">
+        <a class="btn" href="{{ url_for('request_form.form') }}">의뢰서로 조건 남기기</a>
+        <a class="btn btn-sub" href="{{ url_for('listings.index') }}">매물 보러 가기</a>
+      </div>
+    </section>
+    {% else %}
+    <section class="card ask-answer" aria-label="답">
+      <p class="ask-body">{{ result.answer }}</p>
+      {% if result.links %}
+      <p class="ask-check">확인해보기</p>
+      <div class="ask-next">
+        {% for link in result.links %}<a class="btn btn-sub" href="{{ link.url }}">{{ link.label }} →</a>{% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="ask-sources" aria-labelledby="ask-sources-title">
+      <h2 id="ask-sources-title">찾아온 문서 조각</h2>
+      <p class="ask-note">코드가 실제로 찾아온 조각이에요. 점수는 클수록 질문과 비슷해요 (최대 1).</p>
+      <ol>
+        {% for c in result.chunks %}
+        <li class="card-soft ask-chunk{% if c.used %} used{% endif %}">
+          <p class="ask-chunk-top">
+            <strong>{{ c.rank }}위</strong>
+            <span class="ask-file">{{ c.file }}</span>
+            {% if c.used %}<span class="badge">답에 사용</span>{% endif %}
+            <span class="ask-score">점수 {{ c.score }}</span>
+          </p>
+          <div class="ask-bar" aria-hidden="true"><i data-ask-width="{{ c.width }}"></i></div>
+          <p class="ask-preview">{{ c.preview }}…</p>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% elif not error and not notice %}
+    <p class="ask-empty">질문을 쓰거나 위의 예시를 눌러 보세요.</p>
+  {% endif %}
+  </div>
+
+  <p class="ask-foot">집결은 가상 서비스예요. 실제 계약 · 대출 · 법률 상담은 하지 않아요.</p>
+</div>
+
+<script>
+  // 글자 수 · 예시 질문 · '찾는 중' 표시만 하는 편의 기능이에요. 검사와 답은 전부 서버가 해요.
+  (function () {
+    var form = document.querySelector("[data-ask-form]");
+    if (!form) return;
+    var question = form.querySelector("textarea");
+    var count = form.querySelector("[data-ask-count]");
+    var go = form.querySelector("[data-ask-go]");
+
+    document.querySelectorAll("[data-ask-width]").forEach(function (bar) {   // 점수 막대 길이
+      bar.style.width = bar.dataset.askWidth + "%";
+    });
+    function update() { count.textContent = question.value.length; }
+    question.addEventListener("input", update);
+    update();
+
+    form.querySelectorAll("[data-ask-example]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        question.value = button.textContent;
+        update();
+        form.requestSubmit();
+      });
+    });
+    question.addEventListener("keydown", function (e) {      // Enter = 보내기, Shift+Enter = 줄바꿈
+      if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); form.requestSubmit(); }
+    });
+    form.addEventListener("submit", function () {
+      go.disabled = true;
+      go.textContent = "찾는 중…";
+      document.querySelector("[data-ask-result]").hidden = true;
+      document.querySelector("[data-ask-loading]").hidden = false;
+    });
+  })();
+</script>
+{% endblock %}

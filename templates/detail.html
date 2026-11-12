@@ -12,6 +12,9 @@
 { "imports": { "playcanvas": "https://cdn.jsdelivr.net/npm/playcanvas@2.23.3/build/playcanvas.mjs" } }
 </script>
 <script type="module" src="{{ url_for('static', filename='viewer/viewer.js') }}"></script>
+{% elif listing.image_url %}
+{# 3D 스캔이 없는 매물은 사진으로 둘러보기 (엔진 없이 CSS 3D) #}
+<script src="{{ url_for('static', filename='viewer/photo.js') }}" defer></script>
 {% endif %}
 {% endblock %}
 
@@ -49,6 +52,28 @@
 
     <p class="viewer-credit" data-el="credit"></p>
   </section>
+  {% elif listing.image_url %}
+  {# 3D 스캔이 없는 매물 — 매물 사진으로 둘러보기 (static/viewer/photo.js). 3D 스캔이 아니라고 화면에 적어요. #}
+  <section class="viewer viewer-photo" aria-label="사진으로 둘러보기" data-photo="{{ listing.image_url }}">
+    <div class="pv-stage" data-el="stage" tabindex="0" role="img" aria-label="{{ listing.title }} 사진. 드래그하거나 방향키로 둘러봐요.">
+      <div class="pv-world" data-el="world"></div>
+    </div>
+
+    <div class="viewer-loading" data-el="loading" role="status" aria-live="polite">
+      <div class="viewer-spinner" aria-hidden="true"></div>
+      <p>집 안을 불러오는 중이에요…</p>
+    </div>
+
+    <p class="viewer-hint" data-el="hint"><b>드래그</b>해서 집 안을 둘러보세요</p>
+
+    <div class="viewer-tools">
+      <button type="button" class="btn btn-white" data-el="reset">처음 위치</button>
+      <button type="button" class="btn btn-white" data-el="wide" aria-pressed="false">넓게 보기</button>
+      <button type="button" class="btn btn-white" data-el="expand" aria-pressed="false">크게 보기</button>
+    </div>
+
+    <p class="viewer-note"><b>사진 둘러보기</b> 매물 사진으로 보여 드려요. 3D 스캔은 준비 중이에요.</p>
+  </section>
   {% else %}
   <section class="viewer-empty card-soft" aria-label="3D 둘러보기">
     <svg class="logo-mark" viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
@@ -60,7 +85,7 @@
     <div class="detail-head-text">
       <p class="detail-tags">
         <span class="badge">{{ listing.deal_type }}</span>
-        {% if listing.splat_url %}<span class="chip chip-soft">360° 3D</span>{% endif %}
+        {% if listing.splat_url %}<span class="chip chip-soft">360° 3D</span>{% elif listing.image_url %}<span class="chip chip-soft">사진 둘러보기</span>{% endif %}
       </p>
       <h1>{{ listing.title }}</h1>
       <p class="detail-region">{{ listing.region }}</p>

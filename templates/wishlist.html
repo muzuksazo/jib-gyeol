@@ -92,7 +92,7 @@
           <tr>
             <th scope="row">3D 둘러보기</th>
             {% for item in compare %}
-            <td>{% if item.splat_url %}<a href="{{ url_for('detail.show', listing_id=item.id) }}">360° 3D 보기</a>{% else %}<span class="muted">준비 중</span>{% endif %}</td>
+            <td>{% if item.splat_url %}<a href="{{ url_for('detail.show', listing_id=item.id) }}">360° 3D 보기</a>{% else %}<a href="{{ url_for('detail.show', listing_id=item.id) }}">사진으로 둘러보기</a>{% endif %}</td>
             {% endfor %}
           </tr>
           <tr>

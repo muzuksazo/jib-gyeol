@@ -1,0 +1,48 @@
+{# _ask_widget.html — 모든 페이지 오른쪽 아래에 뜨는 물어보기 챗봇 창 (base.html 에서 불러와요)
+   모양: static/ask-widget.css · 동작: static/ask-widget.js · 답: POST /ask/api (pages/ask.py)
+   스크립트가 꺼져 있으면 버튼이 /ask 페이지로 가는 보통 링크로 동작해요. #}
+<a class="askw-launch" href="{{ url_for('ask.index') }}" data-askw-open aria-haspopup="dialog">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1-4.2A8 8 0 1 1 20 12z"/><path d="M9 11h6M9 14.5h3.5"/></svg>
+  물어보기
+</a>
+
+<dialog class="askw" data-askw aria-labelledby="askw-title"
+        data-api="{{ url_for('ask.api') }}" data-max="{{ ask_max_len }}"
+        data-request-url="{{ url_for('request_form.form') }}" data-listings-url="{{ url_for('listings.index') }}">
+  <header class="askw-head">
+    <svg class="logo-mark" viewBox="0 0 164 138" aria-hidden="true"><use href="#logo-house"/></svg>
+    <div class="askw-title">
+      <h2 id="askw-title">집결 상담 도우미</h2>
+      <p>궁금한 점을 바로 답해 드려요</p>
+    </div>
+    <button type="button" class="askw-icon" data-askw-reset aria-label="새 대화 시작" title="새 대화">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/></svg>
+    </button>
+    <button type="button" class="askw-icon" data-askw-close aria-label="물어보기 닫기" title="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+
+  <div class="askw-log" data-askw-log role="log" aria-live="polite" aria-label="대화" tabindex="0">
+    <div class="askw-msg bot">
+      <p>안녕하세요, 집결이에요 👋
+어떤 집을 찾고 계세요?</p>
+    </div>
+    <div class="askw-msg bot">
+      <p>원하는 지역의 매물부터 3D 임장, 의뢰서, 찜 · 비교까지 궁금한 점을 편하게 물어보세요.</p>
+    </div>
+    <div class="askw-examples" data-askw-examples>
+      {% for ex in ask_examples %}<button type="button" data-askw-example>{{ ex }}</button>{% endfor %}
+    </div>
+  </div>
+
+  <form class="askw-form" data-askw-form>
+    <label class="sr-only" for="askw-question">질문</label>
+    <textarea id="askw-question" name="question" rows="1" maxlength="{{ ask_max_len }}" placeholder="궁금한 점을 물어보세요" required></textarea>
+    <button class="askw-send" aria-label="질문 보내기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+    </button>
+  </form>
+  <p class="askw-foot">집결은 가상 서비스예요 · 계약 · 대출 · 법률 상담은 하지 않아요</p>
+</dialog>
+<script src="{{ url_for('static', filename='ask-widget.js') }}" defer></script>

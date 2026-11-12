@@ -13,6 +13,7 @@ except ImportError:                    # 아직 설치 안 했어도 내 컴퓨�
     pass
 
 import db
+from pages.ask import bp as ask_bp
 from pages.detail import bp as detail_bp
 from pages.home import bp as home_bp
 from pages.listings import bp as listings_bp
@@ -30,6 +31,7 @@ app.register_blueprint(listings_bp)    # ② 매물 목록     — 팀원 A
 app.register_blueprint(detail_bp)      # ③ 매물 상세+3D  — 여님
 app.register_blueprint(request_bp)     # ④ 의뢰서        — 팀원 B
 app.register_blueprint(wishlist_bp)    # ⑤ 찜·비교       — PO
+app.register_blueprint(ask_bp)         # ⑥ 물어보기      — D22 RAG (rag.py · docs/ · index.json)
 
 
 @app.errorhandler(404)                 # 없는 주소 · 없는 매물 → 친절한 404 화면 (디자인: 원님)

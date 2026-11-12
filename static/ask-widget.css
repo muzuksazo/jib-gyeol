@@ -1,0 +1,99 @@
+/* ask-widget.css — 물어보기 챗봇 창 (모든 페이지 공통 · templates/_ask_widget.html)
+   색 · 모양은 style.css 의 --color-* 변수를 그대로 써요. 모든 규칙이 .askw · .askw-launch 안에만 적용돼요. */
+
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* ── 여는 버튼 (오른쪽 아래) ── */
+.askw-launch {
+  position: fixed; right: 24px; bottom: 24px; z-index: 30;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 52px; padding: 0 22px 0 18px;
+  background: var(--color-primary); color: var(--color-white);
+  border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);
+  font-weight: 700; font-size: 16px; text-decoration: none;
+  transition: background .15s, transform .1s;
+}
+.askw-launch:hover { background: var(--color-primary-dark); color: var(--color-white); }
+.askw-launch:active { transform: scale(0.97); }
+.askw-launch svg { width: 22px; height: 22px; }
+html.viewer-expanded .askw-launch { display: none; }          /* 3D '크게 보기' 중에는 가리지 않게 */
+
+/* ── 창 (dialog — 뒤 화면이 흐려지고 Esc 로 닫혀요) ── */
+.askw {
+  position: fixed; inset: auto 24px 24px auto; margin: 0; padding: 0;
+  width: min(400px, calc(100vw - 32px)); height: min(640px, calc(100dvh - 48px));
+  max-width: none; max-height: none;
+  border: 0; border-radius: var(--radius-lg); overflow: hidden;
+  background: var(--color-white); color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+}
+.askw[open] { display: flex; flex-direction: column; animation: askw-in .18s ease-out; }
+.askw::backdrop { background: rgba(24, 27, 37, .38); }
+@keyframes askw-in { from { opacity: 0; transform: translateY(12px); } }
+
+/* 머리 */
+.askw-head { display: flex; align-items: center; gap: 10px; padding: 14px 12px 14px 18px; border-bottom: 1px solid var(--color-border); }
+.askw-head .logo-mark { height: 26px; }
+.askw-title { flex: 1; min-width: 0; }
+.askw-title h2 { margin: 0; font-size: 16px; line-height: 1.3; }
+.askw-title p { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--color-text-desc); }
+.askw-icon {
+  width: 40px; height: 40px; min-height: 0; padding: 0; flex-shrink: 0;
+  background: none; color: var(--color-text-sub); border-radius: 50%;
+}
+.askw-icon:hover { background: var(--color-sub); color: var(--color-primary); }
+.askw-icon svg { width: 20px; height: 20px; }
+
+/* 대화 */
+.askw-log { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--color-neutral); }
+.askw-log:focus-visible { outline-offset: -3px; }
+.askw-msg { max-width: 88%; padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.55; overflow-wrap: anywhere; }
+.askw-msg p { margin: 0; white-space: pre-wrap; }
+.askw-msg.user { align-self: flex-end; background: var(--color-primary); color: var(--color-white); border-bottom-right-radius: 6px; }
+.askw-msg.bot { align-self: flex-start; background: var(--color-white); border: 1px solid var(--color-border); border-bottom-left-radius: 6px; }
+.askw-msg.none { color: var(--color-text-sub); }
+.askw-msg.none strong { display: block; color: var(--color-text); margin-bottom: 2px; }
+.askw-msg.error { align-self: flex-start; background: color-mix(in srgb, var(--color-error) 8%, var(--color-white)); color: var(--color-error); font-weight: 600; border-bottom-left-radius: 6px; }
+
+/* 확인해보기 — 답을 직접 확인할 화면으로 가는 버튼 */
+.askw-msg .askw-check { margin-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--color-text-desc); }
+.askw-next { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.askw-msg.none .askw-next { margin-top: 10px; }
+.askw-next a { padding: 7px 13px; border-radius: var(--radius-pill); background: var(--color-sub); color: var(--color-primary); font-size: 13.5px; font-weight: 600; text-decoration: none; }
+.askw-next a:hover { background: var(--color-chip); }
+
+/* 예시 질문 */
+.askw-examples { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.askw-examples button {
+  min-height: 36px; padding: 0 14px; font-size: 14px; font-weight: 600; text-align: left;
+  background: var(--color-white); color: var(--color-primary); border: 1px solid var(--color-chip);
+}
+.askw-examples button:hover { background: var(--color-sub); color: var(--color-primary); }
+
+/* 찾는 중 */
+.askw-dots { display: inline-flex; gap: 5px; padding: 6px 2px; }
+.askw-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--color-primary); animation: askw-dot 1s infinite ease-in-out; }
+.askw-dots i:nth-child(2) { animation-delay: .15s; }
+.askw-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes askw-dot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+/* 입력 */
+.askw-form { display: flex; align-items: flex-end; gap: 8px; padding: 12px 12px 6px 16px; border-top: 1px solid var(--color-border); background: var(--color-white); }
+.askw-form textarea {
+  flex: 1; min-height: 44px; max-height: 120px; padding: 10px 14px; resize: none;
+  font-size: 15px; line-height: 1.5; border-radius: 22px;
+}
+.askw-send { width: 44px; height: 44px; min-height: 0; padding: 0; flex-shrink: 0; border-radius: 50%; }
+.askw-send svg { width: 20px; height: 20px; }
+.askw-send[disabled] { opacity: .5; cursor: progress; }
+.askw-foot { margin: 0; padding: 0 16px 10px; text-align: center; font-size: 11.5px; color: var(--color-text-desc); background: var(--color-white); }
+
+/* 좁은 화면: 화면 전체 */
+@media (max-width: 640px) {
+  .askw { inset: 0; width: 100vw; height: 100dvh; border-radius: 0; }
+  .askw-launch { right: 16px; bottom: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .askw[open] { animation: none; }
+  .askw-dots i { animation: none; }
+}

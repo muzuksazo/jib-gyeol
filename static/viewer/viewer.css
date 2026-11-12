@@ -54,10 +54,28 @@
 .detail-plan-frame .mm-room { font-size: 15px; }
 .detail-plan figcaption { margin-top: 12px; color: var(--color-text-desc); font-size: 14px; }
 
-/* 3D가 없는 매물 */
+/* 3D가 없고 사진도 없는 매물 */
 .viewer-empty { display: grid; place-items: center; gap: 14px; padding: 56px 20px; text-align: center; color: var(--color-text-desc); }
 .viewer-empty .logo-mark { height: 44px; color: var(--color-primary); opacity: .35; }
 .viewer-empty p { margin: 0; }
+
+/* 사진으로 둘러보기 (3D 스캔이 없는 매물 · photo.js) — 사진을 둥근 벽에 붙여 가운데에서 본다 */
+.pv-stage { position: absolute; inset: 0; overflow: hidden; touch-action: none; cursor: grab; background: var(--color-neutral); }
+.viewer.is-dragging .pv-stage { cursor: grabbing; }
+.pv-stage:focus-visible { outline-offset: -3px; border-radius: var(--radius-lg); }
+.pv-world { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+.pv-strip { position: absolute; left: 0; top: 0; background-repeat: no-repeat; backface-visibility: hidden; }
+
+/* 3D 스캔이 아니라는 안내 */
+.viewer-note {
+    position: absolute; right: 14px; bottom: 14px; margin: 0;
+    max-width: min(320px, calc(100% - 340px)); padding: 8px 14px; border-radius: 16px;
+    background: var(--color-white); color: var(--color-text-desc);
+    font-size: 12.5px; line-height: 1.45; box-shadow: var(--shadow);
+    opacity: 0; transition: opacity .3s ease; pointer-events: none;
+}
+.viewer-note b { color: var(--color-primary); margin-right: 4px; }
+.viewer.is-ready .viewer-note { opacity: 1; }
 
 /* ── 3D 뷰어 ───────────────────────────────────────── */
 .viewer {
@@ -199,6 +217,7 @@ html.viewer-expanded { overflow: hidden; }
     .viewer-hint { left: 10px; right: 10px; top: 64px; max-width: none; font-size: 13px; text-align: center; }
     .viewer-minimap { left: 10px; bottom: 10px; border-width: 6px; }
     .viewer-credit { right: 10px; max-width: calc(100% - 180px); font-size: 11px; }
+    .viewer-note { right: 10px; bottom: 10px; max-width: calc(100% - 190px); padding: 6px 10px; font-size: 11px; }
     .detail-actions { width: 100%; }
     .detail-actions form, .detail-actions > .btn { flex: 1; }
     .detail-actions form .btn { width: 100%; }

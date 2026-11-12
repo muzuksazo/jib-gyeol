@@ -12,6 +12,7 @@
   {# 브랜드 글꼴: Pretendard #}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='ask-widget.css') }}">
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -30,6 +31,7 @@
     <nav aria-label="주 메뉴">
       <a href="{{ url_for('listings.index') }}">매물 보기</a>
       <a href="{{ url_for('request_form.form') }}">의뢰서 남기기</a>
+      <a href="{{ url_for('ask.index') }}"{% if request.endpoint != 'ask.index' %} data-askw-open{% endif %}>물어보기</a>
       {% set wish_count = session.get('wish', [])|length %}
       <a class="nav-wish" href="{{ url_for('wishlist.index') }}" aria-label="찜 {{ wish_count }}개">
         찜{% if wish_count %}<span class="nav-badge" aria-hidden="true">{{ wish_count if wish_count < 100 else '99+' }}</span>{% endif %}
@@ -46,5 +48,8 @@
     <strong>집결 ZIPGYEOL</strong> · 집 정보가 한곳에 모이다, 집의 결을 볼 수 있다.<br>
     가상 서비스 · D21 팀 프로젝트
   </footer>
+
+  {# 물어보기 챗봇 창 — 모든 페이지 오른쪽 아래 (/ask 페이지에서는 같은 기능이 본문에 있어서 뺌) #}
+  {% if request.endpoint != 'ask.index' %}{% include "_ask_widget.html" %}{% endif %}
 </body>
 </html>
